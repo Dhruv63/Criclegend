@@ -3,8 +3,10 @@ import '../../../core/theme/app_colors.dart';
 import '../../community/data/community_repository.dart';
 import '../../community/presentation/widgets/feed_post_card.dart';
 import '../../community/presentation/create_post_screen.dart';
+import '../../tournament/presentation/points_table_screen.dart'; // Added this import
 import 'listing_screen.dart';
 import 'store_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart'; // Added this import
 
 class CommunityScreen extends StatefulWidget {
   const CommunityScreen({super.key});
@@ -118,8 +120,26 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
                   mainAxisSpacing: 16,
                   crossAxisSpacing: 16,
                   children: [
-                    _buildGridItem(context, Icons.grid_on, 'Scorers', 'Scorer', ListingType.service),
-                    _buildGridItem(context, Icons.sports, 'Umpires', 'Umpire', ListingType.service),
+                    _ServiceCard(icon: Icons.emoji_events, label: 'Tournaments', onTap: () async {
+                       // Demo: Fetch the CPL 2026 ID
+                       try {
+                         final res = await Supabase.instance.client
+                           .from('tournaments')
+                           .select('id')
+                           .eq('name', 'CricLegend Premier League 2026')
+                           .maybeSingle();
+                         
+                         if (res != null && mounted) {
+                           Navigator.push(context, MaterialPageRoute(builder: (_) => TournamentDetailScreen(tournamentId: res['id'])));
+                         } else if (mounted) {
+                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No active tournament found!')));
+                         }
+                       } catch (e) {
+                         if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+                       }
+                    }),
+                    _ServiceCard(icon: Icons.sports_cricket, label: 'Scorers', onTap: () => _nav(context, 'Scorers')),
+                    _ServiceCard(icon: Icons.sports, label: 'Umpires', onTap: () => _nav(context, 'Umpires')),
                     _buildGridItem(context, Icons.mic, 'Commentators', 'Commentator', ListingType.service),
                     _buildGridItem(context, Icons.live_tv, 'Streamers', 'Streamer', ListingType.service),
                     _buildGridItem(context, Icons.star_border, 'Organisers', 'Organiser', ListingType.service),
@@ -146,6 +166,10 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
     );
   }
 
+  void _nav(BuildContext context, String title) {
+     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Navigate to $title')));
+  }
+
   Widget _buildGridItem(BuildContext context, IconData icon, String label, String dbKey, ListingType type) {
     return InkWell(
       onTap: () {
@@ -156,7 +180,36 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
           ),
         );
       },
-      child: Container(
+      child: _GridItemUI(icon: icon, label: label),
+    );
+  }
+}
+
+class _ServiceCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _ServiceCard({required this.icon, required this.label, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: _GridItemUI(icon: icon, label: label),
+    );
+  }
+}
+
+class _GridItemUI extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const _GridItemUI({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+     return Container(
         decoration: BoxDecoration(
           color: Colors.white,
           border: Border.all(color: Colors.grey.shade200),
@@ -174,7 +227,6 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
             ),
           ],
         ),
-      ),
-    );
+      );
   }
 }

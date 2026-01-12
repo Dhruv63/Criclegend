@@ -13,6 +13,7 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    print('DEBUG: HomeScreen Build');
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -21,34 +22,33 @@ class HomeScreen extends ConsumerWidget {
         appBar: AppBar(
           backgroundColor: AppColors.primary,
           elevation: 0,
-          leading: Builder(
-            builder: (context) => IconButton(
-              icon: const Icon(Icons.menu),
-              onPressed: () => Scaffold.of(context).openDrawer(),
+          leading: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: InkWell(
+              onTap: () => context.push('/profile-setup'), // Access Profile
+              child: const CircleAvatar(
+                backgroundColor: Colors.white,
+                child: Icon(Icons.person, color: AppColors.primary),
+              ),
             ),
           ),
           title: Row(
             children: [
-              Container(
-                decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
-                padding: const EdgeInsets.all(4),
-                child: const Icon(Icons.sports_cricket, color: AppColors.primary, size: 20),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.white),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: const Text('PRO @ ₹199', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-              ),
+               const Icon(Icons.sports_cricket, color: Colors.white, size: 20),
+               const SizedBox(width: 8),
+               const Text("CricLegend", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             ],
           ),
           actions: [
-            IconButton(icon: const Icon(Icons.search), onPressed: () {}),
-            IconButton(icon: const Icon(Icons.chat_bubble_outline), onPressed: () {}),
-            IconButton(icon: const Icon(Icons.notifications_outlined), onPressed: () {}),
+            IconButton(icon: const Icon(Icons.search), onPressed: () => {}), 
+            Builder(
+              builder: (context) {
+                return IconButton(
+                  icon: const Icon(Icons.menu),
+                  onPressed: () => Scaffold.of(context).openDrawer(),
+                );
+              }
+            ),
           ],
           bottom: const TabBar(
             indicatorColor: Colors.white,

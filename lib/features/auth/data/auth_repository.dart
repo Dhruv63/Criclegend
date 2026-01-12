@@ -53,4 +53,21 @@ class AuthRepository {
       ...updates,
     });
   }
+  Future<String?> getUserRole() async {
+    final user = _supabase.auth.currentUser;
+    if (user == null) return null;
+
+    try {
+      final response = await _supabase
+          .from('users')
+          .select('role')
+          .eq('id', user.id)
+          .maybeSingle();
+      
+      return response?['role'] as String? ?? 'user';
+    } catch (e) {
+      print('Error fetching role: $e');
+      return 'user';
+    }
+  }
 }

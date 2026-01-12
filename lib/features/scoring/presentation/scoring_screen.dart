@@ -428,7 +428,7 @@ class _ScoringScreenState extends State<ScoringScreen> {
                   winningTeamId: winningTeamId ?? '',
                   resultDescription: resultText,
                 );
-                if (mounted) context.go('/'); // Back to Home
+                if (mounted) context.go('/home'); // Back to Home
               },
               child: const Text("Confirm & End"),
             )

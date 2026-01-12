@@ -4,12 +4,14 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../features/auth/data/auth_repository.dart';
 import '../features/auth/presentation/providers/auth_providers.dart';
+import '../features/auth/presentation/providers/user_role_provider.dart'; // Moved here
 import '../features/auth/presentation/login_screen.dart';
 import '../features/auth/presentation/signup_screen.dart';
 import '../features/onboarding/presentation/profile_setup_screen.dart';
 import '../features/home/presentation/main_layout.dart';
 import '../features/home/presentation/home_screen.dart';
-import '../features/home/presentation/looking_screen.dart';
+import '../features/looking/presentation/looking_screen.dart';
+import '../features/looking/presentation/create_looking_screen.dart';
 import '../features/home/presentation/my_cricket_screen.dart';
 import '../features/home/presentation/community_screen.dart';
 import '../features/home/presentation/store_screen.dart';
@@ -22,14 +24,12 @@ import '../features/admin/presentation/admin_match_console.dart';
 import '../features/home/presentation/live_match_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
-final _shellNavigatorHomeKey = GlobalKey<NavigatorState>(debugLabel: 'shellHome');
-final _shellNavigatorLookingKey = GlobalKey<NavigatorState>(debugLabel: 'shellLooking');
-final _shellNavigatorMyCricketKey = GlobalKey<NavigatorState>(debugLabel: 'shellMyCricket');
-final _shellNavigatorCommunityKey = GlobalKey<NavigatorState>(debugLabel: 'shellCommunity');
-final _shellNavigatorStoreKey = GlobalKey<NavigatorState>(debugLabel: 'shellStore');
+
+
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   final authRepo = ref.watch(authRepositoryProvider);
+  final roleAsync = ref.watch(userRoleProvider); // Watch the role
   
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
@@ -39,9 +39,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       final session = authRepo.currentUser;
       final isLoggedIn = session != null;
       final isLoggingIn = state.uri.path == '/login' || state.uri.path == '/login/signup';
-      final isAdmin = state.uri.path.startsWith('/admin');
-
-      if (isAdmin) return null; // Let Admin Flow handle itself
+      final isAdminRoute = state.uri.path.startsWith('/admin');
 
       if (!isLoggedIn && !isLoggingIn) {
          return '/login';
@@ -49,6 +47,17 @@ final goRouterProvider = Provider<GoRouter>((ref) {
 
       if (isLoggedIn && isLoggingIn) {
         return '/home';
+      }
+      
+      // RBAC Check
+      if (isAdminRoute && isLoggedIn) {
+        // If role is still loading or not admin, kick them out
+        // Note: For better UX, we might want a loading screen, but for security, deny by default.
+        // We check the value directly if available.
+        final role = roleAsync.asData?.value ?? 'user'; // Fixed valueOrNull
+        if (role != 'admin') {
+          return '/home';
+        }
       }
 
       return null;
@@ -86,35 +95,30 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       branches: [
         // Tab 1: Home
         StatefulShellBranch(
-          navigatorKey: _shellNavigatorHomeKey,
           routes: [
              GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
           ],
         ),
         // Tab 2: Looking
         StatefulShellBranch(
-          navigatorKey: _shellNavigatorLookingKey,
           routes: [
              GoRoute(path: '/looking', builder: (context, state) => const LookingScreen()),
           ],
         ),
         // Tab 3: My Cricket
         StatefulShellBranch(
-          navigatorKey: _shellNavigatorMyCricketKey,
           routes: [
              GoRoute(path: '/my-cricket', builder: (context, state) => const MyCricketScreen()),
           ],
         ),
         // Tab 4: Community
         StatefulShellBranch(
-          navigatorKey: _shellNavigatorCommunityKey,
           routes: [
              GoRoute(path: '/community', builder: (context, state) => const CommunityScreen()),
           ],
         ),
         // Tab 5: Store
         StatefulShellBranch(
-          navigatorKey: _shellNavigatorStoreKey,
           routes: [
              GoRoute(path: '/store', builder: (context, state) => const StoreScreen()),
           ],
@@ -127,6 +131,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       parentNavigatorKey: _rootNavigatorKey, 
       path: '/new-match',
       builder: (context, state) => const CreateMatchScreen(),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/create-looking',
+      builder: (context, state) => const CreateLookingScreen(),
     ),
     GoRoute(
       parentNavigatorKey: _rootNavigatorKey,

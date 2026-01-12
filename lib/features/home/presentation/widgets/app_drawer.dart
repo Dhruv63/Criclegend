@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
+import '../../../auth/presentation/providers/user_role_provider.dart';
 
 class AppDrawer extends ConsumerWidget {
   const AppDrawer({super.key});
@@ -96,6 +97,21 @@ class AppDrawer extends ConsumerWidget {
                   icon: Icons.bar_chart_rounded, 
                   title: 'My Stats',
                   onTap: () => {}, //context.push('/profile/stats'),
+                ),
+                const Divider(),
+                // Admin Panel Section
+                ref.watch(userRoleProvider).when(
+                  data: (role) => role == 'admin' 
+                    ? _buildMenuItem(
+                        context,
+                        icon: Icons.admin_panel_settings,
+                        title: 'Admin Panel',
+                        color: Colors.red,
+                        onTap: () => context.push('/admin/console'),
+                      )
+                    : const SizedBox.shrink(),
+                  error: (_, __) => const SizedBox.shrink(),
+                  loading: () => const SizedBox.shrink(),
                 ),
                 const Divider(),
                  _buildMenuItem(

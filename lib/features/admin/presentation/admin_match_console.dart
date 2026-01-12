@@ -81,7 +81,9 @@ class _AdminMatchConsoleState extends State<AdminMatchConsole> {
                   ),
                   const SizedBox(height: 32),
                   // Match List
-                  Expanded(
+                  // Conditionally render based on selection (Simplified for MVP: Just showing Dashboard or Matches)
+                  // Ideally use a PageView or Riverpod State
+                   Expanded(
                     child: FutureBuilder<List<Map<String, dynamic>>>(
                       future: SupabaseService.getAdminMatches(),
                       builder: (context, snapshot) {

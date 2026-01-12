@@ -14,6 +14,7 @@ class MainLayout extends StatefulWidget {
 class _MainLayoutState extends State<MainLayout> {
   @override
   Widget build(BuildContext context) {
+    print('DEBUG: MainLayout Build');
     return Scaffold(
       body: widget.navigationShell,
       bottomNavigationBar: NavigationBar(
