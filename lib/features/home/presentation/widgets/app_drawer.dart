@@ -107,7 +107,7 @@ class AppDrawer extends ConsumerWidget {
                         icon: Icons.admin_panel_settings,
                         title: 'Admin Panel',
                         color: Colors.red,
-                        onTap: () => context.push('/admin/console'),
+                        onTap: () => context.push('/admin'),
                       )
                     : const SizedBox.shrink(),
                   error: (_, __) => const SizedBox.shrink(),

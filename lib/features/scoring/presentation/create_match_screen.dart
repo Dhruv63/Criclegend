@@ -1,41 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../scoring/data/scoring_provider.dart';
 import '../../scoring/domain/team_model.dart';
 
-class CreateMatchScreen extends ConsumerStatefulWidget {
-  const CreateMatchScreen({super.key});
+class ScheduleMatchScreen extends ConsumerStatefulWidget {
+  const ScheduleMatchScreen({super.key});
 
   @override
-  ConsumerState<CreateMatchScreen> createState() => _CreateMatchScreenState();
+  ConsumerState<ScheduleMatchScreen> createState() => _ScheduleMatchScreenState();
 }
 
-class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
+class _ScheduleMatchScreenState extends ConsumerState<ScheduleMatchScreen> {
   final _oversController = TextEditingController(text: '20');
-  final _groundController = TextEditingController(); // location
+  final _groundController = TextEditingController();
+  final _notesController = TextEditingController();
   
   Team? _teamA;
   Team? _teamB;
 
-  // Toss Logic
-  Team? _tossWinner;
-  String _tossDecision = 'Bat'; // Bat or Bowl
+  DateTime _selectedDate = DateTime.now();
+  TimeOfDay _selectedTime = TimeOfDay.now();
+  String _matchType = 'Friendly';
+  String _matchFormat = 'T20';
   
   bool _isLoading = false;
+
+  final List<String> _matchTypes = ['Friendly', 'League', 'Tournament', 'Practice'];
+  final List<String> _matchFormats = ['T20', 'ODI', 'Test', '100-Ball', 'Custom'];
 
   @override
   void dispose() {
     _oversController.dispose();
     _groundController.dispose();
+    _notesController.dispose();
     super.dispose();
   }
 
-  // Helper to pick a team (Mocked Dialog for now, ideally full search)
   void _pickTeam(bool isTeamA) async {
     final teams = await ref.read(scoringRepositoryProvider).getMyTeams();
-    
     if (!mounted) return;
     
     await showDialog(
@@ -53,7 +58,7 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
                    return ListTile(
                      leading: const Icon(Icons.add),
                      title: const Text('Create New Team'),
-                     onTap: () async {
+                     onTap: () {
                        Navigator.pop(context);
                        _createNewTeam(isTeamA);
                      },
@@ -65,11 +70,6 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
                   onTap: () {
                     setState(() {
                       if (isTeamA) _teamA = team; else _teamB = team;
-                      
-                      // Reset toss if team changed
-                      if (_tossWinner?.id != _teamA?.id && _tossWinner?.id != _teamB?.id) {
-                         _tossWinner = null;
-                      }
                     });
                     Navigator.pop(context);
                   },
@@ -108,27 +108,71 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
      );
   }
   
-  Future<void> _startMatch() async {
-    if (_teamA == null || _teamB == null || _tossWinner == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select teams and toss result')));
+  Future<void> _selectDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime.now().subtract(const Duration(days: 1)),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+    );
+    if (picked != null) {
+      setState(() => _selectedDate = picked);
+    }
+  }
+
+  Future<void> _selectTime() async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: _selectedTime,
+    );
+    if (picked != null) {
+      setState(() => _selectedTime = picked);
+    }
+  }
+
+  void _updateDefaultOvers(String format) {
+    setState(() {
+      _matchFormat = format;
+      if (format == 'T20') _oversController.text = '20';
+      else if (format == 'ODI') _oversController.text = '50';
+      else if (format == '100-Ball') _oversController.text = '16.4'; // Approx or handle balls separately
+      else if (format == 'Test') _oversController.text = '90';
+    });
+  }
+
+  Future<void> _scheduleMatch() async {
+    if (_teamA == null || _teamB == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select both teams')));
       return;
+    }
+    if (_teamA!.id == _teamB!.id) {
+       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Teams must be different')));
+       return;
     }
 
     setState(() => _isLoading = true);
     
     try {
-      final match = await ref.read(scoringRepositoryProvider).createMatch(
+      // Combine Date and Time
+      final scheduledDateTime = DateTime(
+        _selectedDate.year, _selectedDate.month, _selectedDate.day,
+        _selectedTime.hour, _selectedTime.minute
+      );
+
+      await ref.read(scoringRepositoryProvider).createMatch(
         teamAId: _teamA!.id,
         teamBId: _teamB!.id,
         overs: int.tryParse(_oversController.text) ?? 20,
-        ground: _groundController.text,
-        tossWinnerId: _tossWinner!.id,
-        tossDecision: _tossDecision,
+        ground: _groundController.text.isEmpty ? 'Unknown Ground' : _groundController.text,
+        scheduledDate: scheduledDateTime,
+        matchType: _matchType,
+        matchFormat: _matchFormat,
+        notes: _notesController.text,
       );
       
       if (mounted) {
-        // TODO: Navigate to Scoring Screen with matchId
-        context.push('/scoring/${match.id}');
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Match Scheduled Successfully!')));
+        context.go('/home'); // Or to upcoming matches tab
       }
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
@@ -140,7 +184,7 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Start a Match')),
+      appBar: AppBar(title: const Text('Schedule Match')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -152,91 +196,108 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
                 Expanded(child: _buildTeamCard(_teamA, true)),
                  const Padding(
                    padding: EdgeInsets.symmetric(horizontal: 8.0),
-                   child: Text('VS', style: TextStyle(fontWeight: FontWeight.bold)),
+                   child: Text('VS', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
                  ),
                 Expanded(child: _buildTeamCard(_teamB, false)),
               ],
             ),
             const SizedBox(height: 24),
             
-            if (_teamA != null && _teamB != null) ...[
-               _buildSectionHeader('Toss'),
-               const SizedBox(height: 16),
-               Card(
-                 child: Padding(
-                   padding: const EdgeInsets.all(16.0),
-                   child: Column(
-                     crossAxisAlignment: CrossAxisAlignment.start,
-                     children: [
-                       const Text('Who won the toss?'),
-                       Wrap(
-                         spacing: 12,
-                         children: [
-                           ChoiceChip(
-                             label: Text(_teamA!.name),
-                             selected: _tossWinner?.id == _teamA!.id,
-                             onSelected: (val) => setState(() => _tossWinner = val ? _teamA : null),
-                           ),
-                           ChoiceChip(
-                             label: Text(_teamB!.name),
-                             selected: _tossWinner?.id == _teamB!.id,
-                             onSelected: (val) => setState(() => _tossWinner = val ? _teamB : null),
-                           ),
-                         ],
-                       ),
-                       const SizedBox(height: 16),
-                        const Text('Decision?'),
-                       Wrap(
-                         spacing: 12,
-                         children: [
-                           ChoiceChip(
-                             label: const Text('Bat'),
-                             selected: _tossDecision == 'Bat',
-                             onSelected: (val) => setState(() => _tossDecision = 'Bat'),
-                           ),
-                           ChoiceChip(
-                             label: const Text('Bowl'),
-                             selected: _tossDecision == 'Bowl',
-                             onSelected: (val) => setState(() => _tossDecision = 'Bowl'),
-                           ),
-                         ],
-                       ),
-                     ],
-                   ),
-                 ),
-               ),
-               const SizedBox(height: 24),
-            ],
-
             _buildSectionHeader('Match Details'),
             const SizedBox(height: 16),
-            TextFormField(
-              controller: _oversController,
-              decoration: const InputDecoration(
-                labelText: 'Overs',
-                hintText: 'e.g. 20',
-              ),
-              keyboardType: TextInputType.number,
+            
+            // Format & Type
+            Row(
+              children: [
+                Expanded(
+                  child: DropdownButtonFormField<String>(
+                    value: _matchFormat,
+                    decoration: const InputDecoration(labelText: 'Format', border: OutlineInputBorder()),
+                    items: _matchFormats.map((f) => DropdownMenuItem(value: f, child: Text(f))).toList(),
+                    onChanged: (val) => _updateDefaultOvers(val!),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                 Expanded(
+                  child: DropdownButtonFormField<String>(
+                    value: _matchType,
+                    decoration: const InputDecoration(labelText: 'Type', border: OutlineInputBorder()),
+                    items: _matchTypes.map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
+                    onChanged: (val) => setState(() => _matchType = val!),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 16),
-            TextFormField(
-              controller: _groundController,
-              decoration: const InputDecoration(
-                labelText: 'Ground / Location',
-              ),
+
+            // Overs & Ground
+            Row(
+              children: [
+                 Expanded(
+                  child: TextFormField(
+                    controller: _oversController,
+                    decoration: const InputDecoration(labelText: 'Overs', border: OutlineInputBorder()),
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  flex: 2,
+                  child: TextFormField(
+                    controller: _groundController,
+                    decoration: const InputDecoration(labelText: 'Ground / Venue', border: OutlineInputBorder()),
+                  ),
+                ),
+              ],
             ),
+             const SizedBox(height: 16),
+
+            // Date & Time
+            Row(
+              children: [
+                Expanded(
+                  child: InkWell(
+                    onTap: _selectDate,
+                    child: InputDecorator(
+                      decoration: const InputDecoration(labelText: 'Date', border: OutlineInputBorder(), prefixIcon: Icon(Icons.calendar_today)),
+                      child: Text(DateFormat('EEE, d MMM y').format(_selectedDate)),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: InkWell(
+                    onTap: _selectTime,
+                    child: InputDecorator(
+                      decoration: const InputDecoration(labelText: 'Time', border: OutlineInputBorder(), prefixIcon: Icon(Icons.access_time)),
+                      child: Text(_selectedTime.format(context)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            
+            // Notes
+             TextFormField(
+              controller: _notesController,
+              decoration: const InputDecoration(labelText: 'Match Notes (Optional)', border: OutlineInputBorder(), alignLabelWithHint: true),
+              maxLines: 2,
+            ),
+            
             const SizedBox(height: 32),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: _isLoading ? null : _startMatch,
+                onPressed: _isLoading ? null : _scheduleMatch,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.secondary,
+                  backgroundColor: AppColors.primary,
                   padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 child: _isLoading 
                   ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white))
-                  : const Text('Start Scoring', style: TextStyle(fontSize: 18)),
+                  : const Text('Schedule Match', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
               ),
             ),
           ],
@@ -248,16 +309,8 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
   Widget _buildSectionHeader(String title) {
     return Row(
       children: [
-        Container(
-          width: 4, 
-          height: 24, 
-          color: AppColors.primary, 
-          margin: const EdgeInsets.only(right: 8)
-        ),
-        Text(
-          title, 
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)
-        ),
+        Container(width: 4, height: 24, color: AppColors.primary, margin: const EdgeInsets.only(right: 8)),
+        Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
       ],
     );
   }
@@ -267,18 +320,19 @@ class _CreateMatchScreenState extends ConsumerState<CreateMatchScreen> {
       onTap: () => _pickTeam(isTeamA),
       child: Card(
         elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: Colors.grey.shade200)),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
               CircleAvatar(
-                radius: 30,
+                radius: 24,
                 backgroundImage: team?.logoUrl != null ? NetworkImage(team!.logoUrl!) : null,
-                backgroundColor: Colors.grey.shade300,
+                backgroundColor: Colors.grey.shade100,
                 child: team == null ? const Icon(Icons.add, color: Colors.grey) : (team.logoUrl == null ? Text(team.name[0]) : null),
               ),
               const SizedBox(height: 8),
-              Text(team?.name ?? 'Select Team', style: const TextStyle(fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis),
+              Text(team?.name ?? 'Select Team', style: const TextStyle(fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis, textAlign: TextAlign.center),
             ],
           ),
         ),

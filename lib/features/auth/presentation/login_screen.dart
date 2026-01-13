@@ -155,12 +155,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ],
               ),
               
-              const Spacer(),
-              TextButton.icon(
-                onPressed: () => context.go('/admin'),
-                icon: const Icon(Icons.admin_panel_settings, color: Colors.grey),
-                label: const Text('Admin Panel', style: TextStyle(color: Colors.grey)),
-              ),
             ],
           ),
         ),

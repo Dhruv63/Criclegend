@@ -14,6 +14,14 @@ class MatchModel {
   final String? tossDecision;
   final String? resultDescription;
   
+  final DateTime? scheduledDate;
+  final String? matchType;
+  final String? matchFormat;
+  final String? venueName;
+  final String? matchNotes;
+  final DateTime? startedAt;
+  final DateTime? endedAt;
+
   // Relational Objects (Nullable)
   final Team? teamA;
   final Team? teamB;
@@ -31,6 +39,13 @@ class MatchModel {
     this.tossWinnerId,
     this.tossDecision,
     this.resultDescription,
+    this.scheduledDate,
+    this.matchType,
+    this.matchFormat,
+    this.venueName,
+    this.matchNotes,
+    this.startedAt,
+    this.endedAt,
     this.teamA,
     this.teamB,
   });
@@ -46,13 +61,20 @@ class MatchModel {
           ? DateTime.tryParse(json['match_date']) ?? DateTime.now()
           : DateTime.now(),
       oversCount: json['overs_count'] ?? 20,
-      currentStatus: json['status'] ?? 'Scheduled', // Note: 'status' in DB, 'currentStatus' in class
+      currentStatus: json['status'] ?? 'Scheduled',
       winningTeamId: json['winning_team_id'],
       tossWinnerId: json['toss_winner_id'],
       tossDecision: json['toss_decision'],
+      resultDescription: json['result_description'],
+      scheduledDate: json['scheduled_date'] != null ? DateTime.tryParse(json['scheduled_date']) : null,
+      matchType: json['match_type'],
+      matchFormat: json['match_format'],
+      venueName: json['venue_name'],
+      matchNotes: json['match_notes'],
+      startedAt: json['started_at'] != null ? DateTime.tryParse(json['started_at']) : null,
+      endedAt: json['ended_at'] != null ? DateTime.tryParse(json['ended_at']) : null,
       teamA: json['team_a'] != null ? Team.fromJson(json['team_a']) : null,
       teamB: json['team_b'] != null ? Team.fromJson(json['team_b']) : null,
-      resultDescription: json['result_description'],
     );
   }
 }

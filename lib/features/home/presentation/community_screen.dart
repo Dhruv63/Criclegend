@@ -5,7 +5,7 @@ import '../../community/presentation/widgets/feed_post_card.dart';
 import '../../community/presentation/create_post_screen.dart';
 import '../../tournament/presentation/points_table_screen.dart'; // Added this import
 import 'listing_screen.dart';
-import 'store_screen.dart';
+import '../../store/presentation/store_home_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart'; // Added this import
 
 class CommunityScreen extends StatefulWidget {
@@ -54,7 +54,7 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
         actions: [
           IconButton(
             icon: const Icon(Icons.store, color: AppColors.secondary),
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const StoreScreen())),
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const StoreHomeScreen())),
           ),
         ],
       ),

@@ -32,113 +32,120 @@ class _AdminMatchConsoleState extends State<AdminMatchConsole> {
             SizedBox(width: 250, child: _Sidebar(context: context)),
 
           // Main Content
-          Expanded(
-            child: Container(
-              color: Colors.white,
-              padding: const EdgeInsets.all(32),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Responsive Header
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      if (constraints.maxWidth < 600) {
-                        return Column(
-                           crossAxisAlignment: CrossAxisAlignment.stretch,
-                           children: [
-                             const Text('Live / Upcoming Matches', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                             const SizedBox(height: 16),
-                             ElevatedButton.icon(
-                                onPressed: () => context.push('/new-match'), 
-                                icon: const Icon(Icons.add),
-                                label: const Text('Create New Match'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primary,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                ),
-                              ),
-                           ],
-                        );
-                      }
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text('Live / Upcoming Matches', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                          ElevatedButton.icon(
-                            onPressed: () => context.push('/new-match'), 
-                            icon: const Icon(Icons.add),
-                            label: const Text('Create New Match'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primary,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                            ),
-                          ),
-                        ],
-                      );
-                    }
-                  ),
-                  const SizedBox(height: 32),
-                  // Match List
-                  // Conditionally render based on selection (Simplified for MVP: Just showing Dashboard or Matches)
-                  // Ideally use a PageView or Riverpod State
-                   Expanded(
-                    child: FutureBuilder<List<Map<String, dynamic>>>(
-                      future: SupabaseService.getAdminMatches(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());
-                        }
-                        if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                          return Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.sports_cricket, size: 80, color: Colors.grey.shade300),
-                                const SizedBox(height: 16),
-                                Text('No active matches found.', style: TextStyle(fontSize: 18, color: Colors.grey.shade500)),
-                              ],
-                            ),
-                          );
-                        }
+          const Expanded(
+            child: MatchListContent(),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
-                        final matches = snapshot.data!;
-                        return ListView.builder(
-                          itemCount: matches.length,
-                          itemBuilder: (context, index) {
-                            final match = matches[index];
-                            final teamA = match['team_a']['name'];
-                            final teamB = match['team_b']['name'];
-                            final status = match['status'];
-                            
-                            return Card(
-                              margin: const EdgeInsets.only(bottom: 16),
-                              elevation: 2,
-                              child: ListTile(
-                                contentPadding: const EdgeInsets.all(16),
-                                leading: CircleAvatar(
-                                  backgroundColor: status == 'Live' ? Colors.red : Colors.blue,
-                                  child: const Icon(Icons.sports_cricket, color: Colors.white),
-                                ),
-                                title: Text('$teamA vs $teamB', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                                subtitle: Text('Status: $status • Overs: ${match['overs_count'] ?? 20}'),
-                                trailing: ElevatedButton(
-                                  onPressed: () {
-                                    context.push('/scoring/${match['id']}');
-                                  },
-                                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.secondary, foregroundColor: Colors.white),
-                                  child: const Text('Score Match'),
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      },
+class MatchListContent extends StatelessWidget {
+  const MatchListContent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.all(32),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Responsive Header
+          LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth < 600) {
+                return Column(
+                   crossAxisAlignment: CrossAxisAlignment.stretch,
+                   children: [
+                     const Text('Live / Upcoming Matches', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                     const SizedBox(height: 16),
+                     ElevatedButton.icon(
+                        onPressed: () => context.push('/new-match'), 
+                        icon: const Icon(Icons.add),
+                        label: const Text('Create New Match'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                      ),
+                   ],
+                );
+              }
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Live / Upcoming Matches', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                  ElevatedButton.icon(
+                    onPressed: () => context.push('/new-match'), 
+                    icon: const Icon(Icons.add),
+                    label: const Text('Create New Match'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                     ),
                   ),
                 ],
-              ),
+              );
+            }
+          ),
+          const SizedBox(height: 32),
+          // Match List
+           Expanded(
+            child: FutureBuilder<List<Map<String, dynamic>>>(
+              future: SupabaseService.getAdminMatches(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.sports_cricket, size: 80, color: Colors.grey.shade300),
+                        const SizedBox(height: 16),
+                        Text('No active matches found.', style: TextStyle(fontSize: 18, color: Colors.grey.shade500)),
+                      ],
+                    ),
+                  );
+                }
+
+                final matches = snapshot.data!;
+                return ListView.builder(
+                  itemCount: matches.length,
+                  itemBuilder: (context, index) {
+                    final match = matches[index];
+                    final teamA = match['team_a']['name'];
+                    final teamB = match['team_b']['name'];
+                    final status = match['status'];
+                    
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      elevation: 2,
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.all(16),
+                        leading: CircleAvatar(
+                          backgroundColor: status == 'Live' ? Colors.red : Colors.blue,
+                          child: const Icon(Icons.sports_cricket, color: Colors.white),
+                        ),
+                        title: Text('$teamA vs $teamB', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                        subtitle: Text('Status: $status • Overs: ${match['overs_count'] ?? 20}'),
+                        trailing: ElevatedButton(
+                          onPressed: () {
+                            context.push('/scoring/${match['id']}');
+                          },
+                          style: ElevatedButton.styleFrom(backgroundColor: AppColors.secondary, foregroundColor: Colors.white),
+                          child: const Text('Score Match'),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
             ),
           ),
         ],
@@ -178,6 +185,8 @@ class _Sidebar extends StatelessWidget {
         onTap: () {
            if (label != 'Dashboard') {
              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("$label Management Coming Soon!")));
+           } else {
+             context.go('/admin/console');
            }
         },
       ),

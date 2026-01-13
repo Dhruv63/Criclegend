@@ -16,6 +16,7 @@ class _MyCricketScreenState extends ConsumerState<MyCricketScreen> with SingleTi
   late TabController _tabController;
   Map<String, dynamic>? _profile;
   List<Map<String, dynamic>> _matches = [];
+  List<Map<String, dynamic>> _scheduledMatches = [];
   List<Map<String, dynamic>> _teams = [];
   bool _isLoading = false;
 
@@ -23,10 +24,6 @@ class _MyCricketScreenState extends ConsumerState<MyCricketScreen> with SingleTi
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this); 
-    // Data loading triggered in build via ref.listen or just checking state
-    // But we need async fetch for matches/teams.
-    // Better to use ref.listen(userProvider) or just fetch in didChangeDependencies?
-    // Let's use didChangeDependencies or just fetch once if user is present.
     WidgetsBinding.instance.addPostFrameCallback((_) => _loadData());
   }
 
@@ -41,17 +38,18 @@ class _MyCricketScreenState extends ConsumerState<MyCricketScreen> with SingleTi
     
     try {
       // 1. Fetch Profile Data (from public.users)
-      // We can get this from SupabaseService using user.id
       final userData = await SupabaseService.getUserProfile(user.id);
       
       // 2. Fetch Dependent Data
       final matches = await SupabaseService.getCompletedMatches(); // Showing history
+      final scheduled = await SupabaseService.getScheduledMatches();
       final teams = await SupabaseService.getUserTeams(user.id);
       
       if (mounted) {
         setState(() {
           _profile = userData;
           _matches = matches;
+          _scheduledMatches = scheduled;
           _teams = teams;
           _isLoading = false;
         });
@@ -200,52 +198,79 @@ class _MyCricketScreenState extends ConsumerState<MyCricketScreen> with SingleTi
   }
 
   Widget _buildMatchesTab() {
-    if (_matches.isEmpty) {
-      return const Center(child: Text('No matches played yet.'));
+    if (_matches.isEmpty && _scheduledMatches.isEmpty) {
+      return const Center(child: Text('No matches found.'));
     }
 
-    return ListView.builder(
+    return ListView(
       padding: const EdgeInsets.all(16),
-      itemCount: _matches.length,
-      itemBuilder: (context, index) {
-        final match = _matches[index];
-        final teamA = match['team_a']['name'];
-        final teamB = match['team_b']['name'];
-        final ground = match['ground'] ?? 'Unknown Ground';
-        final result = match['result'] ?? 'Match Completed';
+      children: [
+        if (_scheduledMatches.isNotEmpty) ...[
+          const Text('Upcoming Matches', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          const SizedBox(height: 8),
+          ..._scheduledMatches.map((match) {
+            final date = DateTime.tryParse(match['scheduled_date'] ?? match['match_date'] ?? '') ?? DateTime.now();
+            // Format nice date
+            final dateStr = '${date.day}/${date.month} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
 
-        return Card(
-          elevation: 2,
-          margin: const EdgeInsets.only(bottom: 12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(result, style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 12)),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            return Card(
+              color: Colors.blue.shade50,
+              margin: const EdgeInsets.only(bottom: 12),
+              child: ListTile(
+                title: Text('${match['team_a']['name']} vs ${match['team_b']['name']}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: Text('Scheduled: $dateStr'),
+                trailing: ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
+                  onPressed: () => context.push('/match-setup/${match['id']}'),
+                  child: const Text('Start'),
+                ),
+              ),
+            );
+          }).toList(),
+          const Divider(height: 32),
+          const Text('Match History', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          const SizedBox(height: 8),
+        ],
+        
+        ..._matches.map((match) {
+            final teamA = match['team_a']['name'];
+            final teamB = match['team_b']['name'];
+            final ground = match['ground'] ?? 'Unknown Ground';
+            final result = match['result'] ?? 'Match Completed';
+
+            return Card(
+              elevation: 2,
+              margin: const EdgeInsets.only(bottom: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(teamA, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                    const Text('VS', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
-                    Text(teamB, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    Text(result, style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 12)),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(teamA, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                        const Text('VS', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+                        Text(teamB, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        const Icon(Icons.location_on, size: 14, color: Colors.grey),
+                        const SizedBox(width: 4),
+                        Text(ground, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                      ],
+                    )
                   ],
                 ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    const Icon(Icons.location_on, size: 14, color: Colors.grey),
-                    const SizedBox(width: 4),
-                    Text(ground, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-                  ],
-                )
-              ],
-            ),
-          ),
-        );
-      },
+              ),
+            );
+        }).toList(),
+      ],
     );
   }
 

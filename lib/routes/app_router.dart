@@ -14,13 +14,18 @@ import '../features/looking/presentation/looking_screen.dart';
 import '../features/looking/presentation/create_looking_screen.dart';
 import '../features/home/presentation/my_cricket_screen.dart';
 import '../features/home/presentation/community_screen.dart';
-import '../features/home/presentation/store_screen.dart';
-import '../features/scoring/presentation/create_match_screen.dart';
+import '../features/store/presentation/store_home_screen.dart';
+import '../features/scoring/presentation/create_match_screen.dart'; // Contains ScheduleMatchScreen class
+import '../features/scoring/presentation/pre_match_setup_screen.dart';
+import '../features/scoring/presentation/scoring_screen.dart';
 import '../features/teams/presentation/my_teams_screen.dart';
 import '../features/teams/presentation/team_detail_screen.dart';
-import '../features/scoring/presentation/scoring_screen.dart';
 import '../features/admin/presentation/admin_login_screen.dart';
 import '../features/admin/presentation/admin_match_console.dart';
+import '../features/admin/presentation/admin_console_screen.dart';
+import '../features/store/presentation/cart_screen.dart';
+import '../features/store/presentation/checkout_screen.dart';
+import '../features/store/presentation/my_orders_screen.dart';
 import '../features/home/presentation/live_match_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -65,13 +70,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     routes: [
     GoRoute(
       path: '/admin',
-      builder: (context, state) => const AdminLoginScreen(),
-      routes: [
-        GoRoute(
-          path: 'console',
-          builder: (context, state) => const AdminMatchConsole(),
-        ),
-      ],
+      builder: (context, state) => const AdminConsoleScreen(),
     ),
     GoRoute(
       path: '/login',
@@ -120,7 +119,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         // Tab 5: Store
         StatefulShellBranch(
           routes: [
-             GoRoute(path: '/store', builder: (context, state) => const StoreScreen()),
+             GoRoute(path: '/store', builder: (context, state) => const StoreHomeScreen()),
           ],
         ),
       ],
@@ -130,19 +129,37 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     GoRoute(
       parentNavigatorKey: _rootNavigatorKey, 
       path: '/new-match',
-      builder: (context, state) => const CreateMatchScreen(),
+      builder: (context, state) => const ScheduleMatchScreen(),
     ),
     GoRoute(
       parentNavigatorKey: _rootNavigatorKey,
       path: '/create-looking',
       builder: (context, state) => const CreateLookingScreen(),
     ),
+    // Start Match (Schedule)
     GoRoute(
       parentNavigatorKey: _rootNavigatorKey,
-      path: '/scoring/:id',
+      path: '/start-match',
+      builder: (context, state) => const ScheduleMatchScreen(),
+    ),
+
+    // Pre-Match Setup (Toss)
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/match-setup/:matchId',
       builder: (context, state) {
-        final id = state.pathParameters['id']!;
-        return ScoringScreen(matchId: id);
+         final matchId = state.pathParameters['matchId']!;
+         return PreMatchSetupScreen(matchId: matchId);
+      },
+    ),
+
+    // Scoring Screen
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/scoring/:matchId',
+      builder: (context, state) {
+        final matchId = state.pathParameters['matchId']!;
+        return ScoringScreen(matchId: matchId);
       },
     ),
     GoRoute(
@@ -166,6 +183,23 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         final team = state.extra as Map<String, dynamic>;
         return TeamDetailScreen(team: team);
       },
+    ),
+
+    // Store Routes
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/store/cart',
+      builder: (context, state) => const CartScreen(),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/store/checkout',
+      builder: (context, state) => const CheckoutScreen(),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/store/orders',
+      builder: (context, state) => const MyOrdersScreen(),
     ),
   ],
   );

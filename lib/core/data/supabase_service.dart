@@ -34,6 +34,20 @@ class SupabaseService {
     }
   }
 
+  static Future<List<Map<String, dynamic>>> getScheduledMatches() async {
+    try {
+      final response = await client
+          .from('matches')
+          .select('*, team_a:teams!team_a_id(*), team_b:teams!team_b_id(*)')
+          .or('status.eq.scheduled,status.eq.Scheduled,status.eq.upcoming,status.eq.Upcoming')
+          .order('scheduled_date', ascending: true);
+      return List<Map<String, dynamic>>.from(response);
+    } catch (e) {
+      print('Error fetching scheduled matches: $e');
+      return [];
+    }
+  }
+
   // --- Products ---
   static Future<List<Map<String, dynamic>>> getProducts() async {
     try {
