@@ -27,6 +27,9 @@ echo "----------------------------------------------------------------"
 # Enable web support
 flutter config --enable-web
 
+# Clean previous builds
+flutter clean
+
 # Install dependencies
 flutter pub get
 
