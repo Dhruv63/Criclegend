@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../features/auth/data/auth_repository.dart';
 import '../features/auth/presentation/providers/auth_providers.dart';
 import '../features/auth/presentation/providers/user_role_provider.dart'; // Moved here
 import '../features/auth/presentation/login_screen.dart';
@@ -20,9 +19,12 @@ import '../features/scoring/presentation/pre_match_setup_screen.dart';
 import '../features/scoring/presentation/scoring_screen.dart';
 import '../features/teams/presentation/my_teams_screen.dart';
 import '../features/teams/presentation/team_detail_screen.dart';
-import '../features/admin/presentation/admin_login_screen.dart';
-import '../features/admin/presentation/admin_match_console.dart';
+import '../features/profile/presentation/player_profile_screen.dart';
 import '../features/admin/presentation/admin_console_screen.dart';
+import '../features/admin/presentation/admin_match_console.dart';
+import '../features/admin/presentation/store/product_management_screen.dart';
+import '../features/admin/presentation/store/add_edit_product_screen.dart';
+import '../features/admin/presentation/store/order_management_screen.dart';
 import '../features/store/presentation/cart_screen.dart';
 import '../features/store/presentation/checkout_screen.dart';
 import '../features/store/presentation/my_orders_screen.dart';
@@ -30,12 +32,10 @@ import '../features/home/presentation/live_match_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
-
-
 final goRouterProvider = Provider<GoRouter>((ref) {
   final authRepo = ref.watch(authRepositoryProvider);
   final roleAsync = ref.watch(userRoleProvider); // Watch the role
-  
+
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/login',
@@ -43,17 +43,18 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
       final session = authRepo.currentUser;
       final isLoggedIn = session != null;
-      final isLoggingIn = state.uri.path == '/login' || state.uri.path == '/login/signup';
+      final isLoggingIn =
+          state.uri.path == '/login' || state.uri.path == '/login/signup';
       final isAdminRoute = state.uri.path.startsWith('/admin');
 
       if (!isLoggedIn && !isLoggingIn) {
-         return '/login';
+        return '/login';
       }
 
       if (isLoggedIn && isLoggingIn) {
         return '/home';
       }
-      
+
       // RBAC Check
       if (isAdminRoute && isLoggedIn) {
         // If role is still loading or not admin, kick them out
@@ -68,140 +69,187 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-    GoRoute(
-      path: '/admin',
-      builder: (context, state) => const AdminConsoleScreen(),
-    ),
-    GoRoute(
-      path: '/login',
-      builder: (context, state) => const LoginScreen(),
-      routes: [
-        GoRoute(
-          path: 'signup',
-          builder: (context, state) => const SignUpScreen(),
-        ),
-      ],
-    ),
-    GoRoute(
-      path: '/profile-setup',
-      builder: (context, state) => const ProfileSetupScreen(),
-    ),
-    // Stateful Nested Navigation (Bottom Tab Bar)
-    StatefulShellRoute.indexedStack(
-      builder: (context, state, navigationShell) {
-        return MainLayout(navigationShell: navigationShell);
-      },
-      branches: [
-        // Tab 1: Home
-        StatefulShellBranch(
-          routes: [
-             GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
-          ],
-        ),
-        // Tab 2: Looking
-        StatefulShellBranch(
-          routes: [
-             GoRoute(path: '/looking', builder: (context, state) => const LookingScreen()),
-          ],
-        ),
-        // Tab 3: My Cricket
-        StatefulShellBranch(
-          routes: [
-             GoRoute(path: '/my-cricket', builder: (context, state) => const MyCricketScreen()),
-          ],
-        ),
-        // Tab 4: Community
-        StatefulShellBranch(
-          routes: [
-             GoRoute(path: '/community', builder: (context, state) => const CommunityScreen()),
-          ],
-        ),
-        // Tab 5: Store
-        StatefulShellBranch(
-          routes: [
-             GoRoute(path: '/store', builder: (context, state) => const StoreHomeScreen()),
-          ],
-        ),
-      ],
-    ),
-    
-    // OTHER ROUTES (Push on top of tabs)
-    GoRoute(
-      parentNavigatorKey: _rootNavigatorKey, 
-      path: '/new-match',
-      builder: (context, state) => const ScheduleMatchScreen(),
-    ),
-    GoRoute(
-      parentNavigatorKey: _rootNavigatorKey,
-      path: '/create-looking',
-      builder: (context, state) => const CreateLookingScreen(),
-    ),
-    // Start Match (Schedule)
-    GoRoute(
-      parentNavigatorKey: _rootNavigatorKey,
-      path: '/start-match',
-      builder: (context, state) => const ScheduleMatchScreen(),
-    ),
+      GoRoute(
+        path: '/admin',
+        builder: (context, state) => const AdminConsoleScreen(),
+        routes: [
+          GoRoute(
+            path: 'matches',
+            builder: (context, state) => const AdminMatchConsole(),
+          ),
+          GoRoute(
+            path: 'products',
+            builder: (context, state) => const ProductManagementScreen(),
+            routes: [
+               GoRoute(
+                path: 'add',
+                builder: (context, state) => const AddEditProductScreen(),
+              ),
+            ]
+          ),
+          GoRoute(
+            path: 'orders',
+            builder: (context, state) => const OrderManagementScreen(),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/login',
+        builder: (context, state) => const LoginScreen(),
+        routes: [
+          GoRoute(
+            path: 'signup',
+            builder: (context, state) => const SignUpScreen(),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/profile-setup',
+        builder: (context, state) => const ProfileSetupScreen(),
+      ),
+      // Stateful Nested Navigation (Bottom Tab Bar)
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return MainLayout(navigationShell: navigationShell);
+        },
+        branches: [
+          // Tab 1: Home
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/home',
+                builder: (context, state) => const HomeScreen(),
+              ),
+            ],
+          ),
+          // Tab 2: Looking
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/looking',
+                builder: (context, state) => const LookingScreen(),
+              ),
+            ],
+          ),
+          // Tab 3: My Cricket
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/my-cricket',
+                builder: (context, state) => const MyCricketScreen(),
+              ),
+            ],
+          ),
+          // Tab 4: Community
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/community',
+                builder: (context, state) => const CommunityScreen(),
+              ),
+            ],
+          ),
+          // Tab 5: Store
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/store',
+                builder: (context, state) => const StoreHomeScreen(),
+              ),
+            ],
+          ),
+        ],
+      ),
 
-    // Pre-Match Setup (Toss)
-    GoRoute(
-      parentNavigatorKey: _rootNavigatorKey,
-      path: '/match-setup/:matchId',
-      builder: (context, state) {
-         final matchId = state.pathParameters['matchId']!;
-         return PreMatchSetupScreen(matchId: matchId);
-      },
-    ),
+      // OTHER ROUTES (Push on top of tabs)
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '/new-match',
+        builder: (context, state) => const ScheduleMatchScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '/create-looking',
+        builder: (context, state) => const CreateLookingScreen(),
+      ),
+      // Start Match (Schedule)
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '/start-match',
+        builder: (context, state) => const ScheduleMatchScreen(),
+      ),
 
-    // Scoring Screen
-    GoRoute(
-      parentNavigatorKey: _rootNavigatorKey,
-      path: '/scoring/:matchId',
-      builder: (context, state) {
-        final matchId = state.pathParameters['matchId']!;
-        return ScoringScreen(matchId: matchId);
-      },
-    ),
-    GoRoute(
-      parentNavigatorKey: _rootNavigatorKey,
-      path: '/live-match/:id',
-      builder: (context, state) {
-        final id = state.pathParameters['id']!;
-        return LiveMatchScreen(matchId: id);
-      },
-    ),
-    // Team Management Routes
-    GoRoute(
-      parentNavigatorKey: _rootNavigatorKey,
-      path: '/my-teams',
-      builder: (context, state) => const MyTeamsScreen(),
-    ),
-    GoRoute(
-      parentNavigatorKey: _rootNavigatorKey,
-      path: '/team/:id',
-      builder: (context, state) {
-        final team = state.extra as Map<String, dynamic>;
-        return TeamDetailScreen(team: team);
-      },
-    ),
+      // Pre-Match Setup (Toss)
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '/match-setup/:matchId',
+        builder: (context, state) {
+          final matchId = state.pathParameters['matchId']!;
+          return PreMatchSetupScreen(matchId: matchId);
+        },
+      ),
 
-    // Store Routes
-    GoRoute(
-      parentNavigatorKey: _rootNavigatorKey,
-      path: '/store/cart',
-      builder: (context, state) => const CartScreen(),
-    ),
-    GoRoute(
-      parentNavigatorKey: _rootNavigatorKey,
-      path: '/store/checkout',
-      builder: (context, state) => const CheckoutScreen(),
-    ),
-    GoRoute(
-      parentNavigatorKey: _rootNavigatorKey,
-      path: '/store/orders',
-      builder: (context, state) => const MyOrdersScreen(),
-    ),
-  ],
+      // Scoring Screen
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '/scoring/:matchId',
+        builder: (context, state) {
+          final matchId = state.pathParameters['matchId']!;
+          return ScoringScreen(matchId: matchId);
+        },
+      ),
+      // Live Match Route
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '/live-match/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return LiveMatchScreen(matchId: id);
+        },
+      ),
+
+      // Profile Route
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '/profile/:userId',
+        builder: (context, state) {
+          final userId = state.pathParameters['userId']!;
+          return PlayerProfileScreen(userId: userId);
+        },
+      ),
+
+      // Team Management Routes
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '/my-teams',
+        builder: (context, state) => const MyTeamsScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '/team/:id',
+        builder: (context, state) {
+          final team = state.extra as Map<String, dynamic>;
+          return TeamDetailScreen(team: team);
+        },
+      ),
+
+      // Store Routes
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '/store/cart',
+        builder: (context, state) => const CartScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '/store/checkout',
+        builder: (context, state) => const CheckoutScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '/store/orders',
+        builder: (context, state) => const MyOrdersScreen(),
+      ),
+    ],
   );
 });
 

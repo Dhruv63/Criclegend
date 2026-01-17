@@ -1,10 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'scoring_provider.dart';
 import 'scoring_state.dart';
 
 // The Notifier (Riverpod 2.0 Style)
 class ScoringNotifier extends Notifier<ScoringState> {
-  
   @override
   ScoringState build() {
     return ScoringState();
@@ -37,27 +35,27 @@ class ScoringNotifier extends Notifier<ScoringState> {
     // Logic
     int ballRuns = runs;
     int extraRuns = 0;
-    
+
     if (isWide || isNoBall) {
       extraRuns += 1;
       // Wide/NB doesn't count as a legal ball
     } else {
       balls += 1;
     }
-    
+
     // Total for this event
     currentRuns += ballRuns + extraRuns;
-    
+
     if (isWicket) {
       currentWickets += 1;
     }
-    
+
     // Over Completion
     if (balls >= 6) {
       overs += 1;
       balls = 0;
     }
-    
+
     // Update State Optimistically
     state = state.copyWith(
       totalRuns: currentRuns,
@@ -71,4 +69,6 @@ class ScoringNotifier extends Notifier<ScoringState> {
 }
 
 // The Provider
-final scoringProvider = NotifierProvider<ScoringNotifier, ScoringState>(ScoringNotifier.new);
+final scoringProvider = NotifierProvider<ScoringNotifier, ScoringState>(
+  ScoringNotifier.new,
+);

@@ -15,7 +15,10 @@ class MyTeamsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        title: Text('My Teams', style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
+        title: Text(
+          'My Teams',
+          style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: AppColors.deepTeal, // User Request
         foregroundColor: Colors.white,
       ),
@@ -35,11 +38,24 @@ class MyTeamsScreen extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.sports_cricket, size: 64, color: Colors.grey.shade300),
+                  Icon(
+                    Icons.sports_cricket,
+                    size: 64,
+                    color: Colors.grey.shade300,
+                  ),
                   const SizedBox(height: 16),
-                  Text('No teams found', style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold)),
+                  Text(
+                    'No teams found',
+                    style: GoogleFonts.outfit(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   const SizedBox(height: 8),
-                  const Text('Create your first team to start managing.', style: TextStyle(color: Colors.grey)),
+                  const Text(
+                    'Create your first team to start managing.',
+                    style: TextStyle(color: Colors.grey),
+                  ),
                 ],
               ),
             );
@@ -53,7 +69,9 @@ class MyTeamsScreen extends ConsumerWidget {
               return Card(
                 elevation: 4,
                 margin: const EdgeInsets.only(bottom: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 child: InkWell(
                   onTap: () {
                     // Navigate to details
@@ -71,7 +89,10 @@ class MyTeamsScreen extends ConsumerWidget {
                             color: Colors.grey.shade200,
                             borderRadius: BorderRadius.circular(30),
                             image: team['logo_url'] != null
-                                ? DecorationImage(image: NetworkImage(team['logo_url']), fit: BoxFit.cover)
+                                ? DecorationImage(
+                                    image: NetworkImage(team['logo_url']),
+                                    fit: BoxFit.cover,
+                                  )
                                 : null,
                           ),
                           child: team['logo_url'] == null
@@ -83,12 +104,25 @@ class MyTeamsScreen extends ConsumerWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(team['name'], style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold)),
-                              Text(team['city'] ?? 'Unknown City', style: const TextStyle(color: Colors.grey)),
+                              Text(
+                                team['name'],
+                                style: GoogleFonts.outfit(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                team['city'] ?? 'Unknown City',
+                                style: const TextStyle(color: Colors.grey),
+                              ),
                             ],
                           ),
                         ),
-                        const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                        const Icon(
+                          Icons.arrow_forward_ios,
+                          size: 16,
+                          color: Colors.grey,
+                        ),
                       ],
                     ),
                   ),
@@ -105,7 +139,9 @@ class MyTeamsScreen extends ConsumerWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (context) => const CreateTeamSheet(),
     );
   }
@@ -125,23 +161,26 @@ class _CreateTeamSheetState extends ConsumerState<CreateTeamSheet> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    
+
     // Close keyboard
     FocusScope.of(context).unfocus();
 
     try {
-      await ref.read(teamControllerProvider.notifier).createTeam(
-        name: _nameController.text,
-        city: _cityController.text,
-      );
-      
+      await ref
+          .read(teamControllerProvider.notifier)
+          .createTeam(name: _nameController.text, city: _cityController.text);
+
       if (mounted) {
         Navigator.pop(context); // Close sheet
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Team created successfully!')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Team created successfully!')),
+        );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+        );
       }
     }
   }
@@ -153,8 +192,10 @@ class _CreateTeamSheetState extends ConsumerState<CreateTeamSheet> {
 
     return Padding(
       padding: EdgeInsets.only(
-        top: 24, left: 24, right: 24,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 24
+        top: 24,
+        left: 24,
+        right: 24,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
       ),
       child: Form(
         key: _formKey,
@@ -162,9 +203,15 @@ class _CreateTeamSheetState extends ConsumerState<CreateTeamSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Create New Team', style: GoogleFonts.outfit(fontSize: 24, fontWeight: FontWeight.bold)),
+            Text(
+              'Create New Team',
+              style: GoogleFonts.outfit(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 24),
-            
+
             TextFormField(
               controller: _nameController,
               decoration: const InputDecoration(
@@ -175,7 +222,7 @@ class _CreateTeamSheetState extends ConsumerState<CreateTeamSheet> {
               validator: (v) => v!.isEmpty ? 'Name is required' : null,
             ),
             const SizedBox(height: 16),
-            
+
             TextFormField(
               controller: _cityController,
               decoration: const InputDecoration(
@@ -186,7 +233,7 @@ class _CreateTeamSheetState extends ConsumerState<CreateTeamSheet> {
               validator: (v) => v!.isEmpty ? 'City is required' : null,
             ),
             const SizedBox(height: 24),
-            
+
             SizedBox(
               width: double.infinity,
               height: 50,
@@ -195,11 +242,26 @@ class _CreateTeamSheetState extends ConsumerState<CreateTeamSheet> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.premiumRed,
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
-                child: isLoading 
-                  ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                  : const Text('Create Team', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                child: isLoading
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Text(
+                        'Create Team',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
               ),
             ),
           ],

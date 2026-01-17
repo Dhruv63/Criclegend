@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/data/supabase_service.dart';
 import '../../auth/presentation/providers/auth_providers.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MyCricketScreen extends ConsumerStatefulWidget {
   const MyCricketScreen({super.key});
@@ -12,7 +13,8 @@ class MyCricketScreen extends ConsumerStatefulWidget {
   ConsumerState<MyCricketScreen> createState() => _MyCricketScreenState();
 }
 
-class _MyCricketScreenState extends ConsumerState<MyCricketScreen> with SingleTickerProviderStateMixin {
+class _MyCricketScreenState extends ConsumerState<MyCricketScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   Map<String, dynamic>? _profile;
   List<Map<String, dynamic>> _matches = [];
@@ -23,7 +25,7 @@ class _MyCricketScreenState extends ConsumerState<MyCricketScreen> with SingleTi
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this); 
+    _tabController = TabController(length: 4, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) => _loadData());
   }
 
@@ -35,16 +37,17 @@ class _MyCricketScreenState extends ConsumerState<MyCricketScreen> with SingleTi
     }
 
     setState(() => _isLoading = true);
-    
+
     try {
       // 1. Fetch Profile Data (from public.users)
       final userData = await SupabaseService.getUserProfile(user.id);
-      
+
       // 2. Fetch Dependent Data
-      final matches = await SupabaseService.getCompletedMatches(); // Showing history
+      final matches =
+          await SupabaseService.getCompletedMatches(); // Showing history
       final scheduled = await SupabaseService.getScheduledMatches();
       final teams = await SupabaseService.getUserTeams(user.id);
-      
+
       if (mounted) {
         setState(() {
           _profile = userData;
@@ -66,30 +69,75 @@ class _MyCricketScreenState extends ConsumerState<MyCricketScreen> with SingleTi
     super.dispose();
   }
 
+  Widget _buildStatsTab() {
+    if (_profile == null) return const Center(child: Text('Loading...'));
+    final userId = ref.read(userProvider)?.id;
+
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.analytics, size: 64, color: AppColors.primary),
+          const SizedBox(height: 16),
+          Text(
+            'View Your Career Stats',
+            style: GoogleFonts.outfit(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Check your batting averages, bowling figures, and full match history.',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.grey),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
+            icon: const Icon(Icons.person),
+            label: const Text('Open My Profile'),
+            onPressed: () {
+              if (userId != null) context.push('/profile/$userId');
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    
+    if (_isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
     // If not loaded and no user, show login prompt or empty state (should ideally not happen due to AuthGuard)
     if (_profile == null) {
-        return Scaffold(
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text('Profile not loaded'),
-                TextButton(onPressed: _loadData, child: const Text('Retry'))
-              ],
-            ),
-          )
-        );
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('Profile not loaded'),
+              TextButton(onPressed: _loadData, child: const Text('Retry')),
+            ],
+          ),
+        ),
+      );
     }
 
     final profile = _profile!['profile_json'] ?? {};
     final name = profile['name'] ?? 'Player';
     final role = profile['role'] ?? 'Cricketer';
     final location = profile['location'] ?? 'Mumbai';
-    final imageUrl = 'https://ui-avatars.com/api/?background=random&name=${name.replaceAll(' ', '+')}';
+    final imageUrl =
+        'https://ui-avatars.com/api/?background=random&name=${name.replaceAll(' ', '+')}';
 
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
@@ -103,53 +151,75 @@ class _MyCricketScreenState extends ConsumerState<MyCricketScreen> with SingleTi
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             child: Column(
               children: [
-                 Row(
-                   children: [
-                     CircleAvatar(radius: 30, backgroundImage: NetworkImage(imageUrl)),
-                     const SizedBox(width: 16),
-                     Expanded( // Wrap text column in Expanded to prevent overflow
-                       child: Column(
-                         crossAxisAlignment: CrossAxisAlignment.start,
-                         children: [
-                           Text(name, 
-                             style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-                             maxLines: 1, 
-                             overflow: TextOverflow.ellipsis, // Handle text overflow
-                           ),
-                           Text('$role • $location', 
-                             style: const TextStyle(color: Colors.white70, fontSize: 12),
-                             maxLines: 1,
-                             overflow: TextOverflow.ellipsis,
-                           ),
-                         ],
-                       ),
-                     ),
-                     // const Spacer(), // Spacer not needed if using Expanded, or use Spacer AFTER Expanded if we want gaps?
-                     // Actually, if we use Expanded on Column, it takes ALL space.
-                     // If we want the PRO badge to be right-aligned, Expanded pushes it there.
-                     // But if we want it *pushed* to the end, Expanded does that.
-                     // However, "Spacer()" is essentially Expanded(flex: 1).
-                     // If we have Expanded(Column) and Spacer(), they share space.
-                     // We probably want Column to take "needed" space up to limit?
-                     // No, "My Cricket" header usually has name on left, badge on right.
-                     // Expanded(Column) ensures Column uses available space.
-                     const SizedBox(width: 16),
-                     Container(
-                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                       decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(12)),
-                       child: const Text('PRO', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
-                     )
-                   ],
-                 ),
-                 const SizedBox(height: 16),
-                 Row(
-                   mainAxisAlignment: MainAxisAlignment.spaceAround,
-                   children: [
-                     _buildStatItem('Matches', '${profile['matches_played'] ?? 0}'),
-                     _buildStatItem('Runs', '${profile['total_runs'] ?? 0}'),
-                     _buildStatItem('Wickets', '${profile['total_wickets'] ?? 0}'),
-                   ],
-                 )
+                Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 30,
+                      backgroundImage: NetworkImage(imageUrl),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            name,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            '$role • $location',
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white24,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Text(
+                        'PRO',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildStatItem(
+                      'Matches',
+                      '${profile['matches_played'] ?? 0}',
+                    ),
+                    _buildStatItem('Runs', '${profile['total_runs'] ?? 0}'),
+                    _buildStatItem(
+                      'Wickets',
+                      '${profile['total_wickets'] ?? 0}',
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -178,7 +248,7 @@ class _MyCricketScreenState extends ConsumerState<MyCricketScreen> with SingleTi
               children: [
                 _buildMatchesTab(),
                 _buildTeamsTab(),
-                const Center(child: Text('Detailed Stats Coming Soon')),
+                _buildStatsTab(),
                 const Center(child: Text('No Awards Yet')),
               ],
             ),
@@ -191,8 +261,18 @@ class _MyCricketScreenState extends ConsumerState<MyCricketScreen> with SingleTi
   Widget _buildStatItem(String label, String value) {
     return Column(
       children: [
-        Text(value, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-        Text(label, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          label,
+          style: const TextStyle(color: Colors.white70, fontSize: 12),
+        ),
       ],
     );
   }
@@ -206,70 +286,124 @@ class _MyCricketScreenState extends ConsumerState<MyCricketScreen> with SingleTi
       padding: const EdgeInsets.all(16),
       children: [
         if (_scheduledMatches.isNotEmpty) ...[
-          const Text('Upcoming Matches', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          const Text(
+            'Upcoming Matches',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
           const SizedBox(height: 8),
           ..._scheduledMatches.map((match) {
-            final date = DateTime.tryParse(match['scheduled_date'] ?? match['match_date'] ?? '') ?? DateTime.now();
+            final date =
+                DateTime.tryParse(
+                  match['scheduled_date'] ?? match['match_date'] ?? '',
+                ) ??
+                DateTime.now();
             // Format nice date
-            final dateStr = '${date.day}/${date.month} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
+            final dateStr =
+                '${date.day}/${date.month} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
 
             return Card(
               color: Colors.blue.shade50,
               margin: const EdgeInsets.only(bottom: 12),
               child: ListTile(
-                title: Text('${match['team_a']['name']} vs ${match['team_b']['name']}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                title: Text(
+                  '${match['team_a']['name']} vs ${match['team_b']['name']}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
                 subtitle: Text('Scheduled: $dateStr'),
                 trailing: ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                  ),
                   onPressed: () => context.push('/match-setup/${match['id']}'),
                   child: const Text('Start'),
                 ),
               ),
             );
-          }).toList(),
+          }),
           const Divider(height: 32),
-          const Text('Match History', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          const Text(
+            'Match History',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
           const SizedBox(height: 8),
         ],
-        
-        ..._matches.map((match) {
-            final teamA = match['team_a']['name'];
-            final teamB = match['team_b']['name'];
-            final ground = match['ground'] ?? 'Unknown Ground';
-            final result = match['result'] ?? 'Match Completed';
 
-            return Card(
-              elevation: 2,
-              margin: const EdgeInsets.only(bottom: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(result, style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 12)),
-                    const SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(teamA, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                        const Text('VS', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
-                        Text(teamB, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                      ],
+        ..._matches.map((match) {
+          final teamA = match['team_a']['name'];
+          final teamB = match['team_b']['name'];
+          final ground = match['ground'] ?? 'Unknown Ground';
+          final result = match['result'] ?? 'Match Completed';
+
+          return Card(
+            elevation: 2,
+            margin: const EdgeInsets.only(bottom: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    result,
+                    style: const TextStyle(
+                      color: Colors.green,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
                     ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        const Icon(Icons.location_on, size: 14, color: Colors.grey),
-                        const SizedBox(width: 4),
-                        Text(ground, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-                      ],
-                    )
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        teamA,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      const Text(
+                        'VS',
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        teamB,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.location_on,
+                        size: 14,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        ground,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            );
-        }).toList(),
+            ),
+          );
+        }),
       ],
     );
   }
@@ -302,9 +436,14 @@ class _MyCricketScreenState extends ConsumerState<MyCricketScreen> with SingleTi
                     final team = _teams[index];
                     return Card(
                       child: ListTile(
-                        leading: CircleAvatar(backgroundColor: Colors.grey.shade200, child: const Icon(Icons.group)),
+                        leading: CircleAvatar(
+                          backgroundColor: Colors.grey.shade200,
+                          child: const Icon(Icons.group),
+                        ),
                         title: Text(team['name']),
-                        subtitle: Text(team['location'] ?? (team['city'] ?? 'Unknown')),
+                        subtitle: Text(
+                          team['location'] ?? (team['city'] ?? 'Unknown'),
+                        ),
                         // trailing: const Icon(Icons.star, color: Colors.amber),
                       ),
                     );
@@ -315,4 +454,3 @@ class _MyCricketScreenState extends ConsumerState<MyCricketScreen> with SingleTi
     );
   }
 }
-

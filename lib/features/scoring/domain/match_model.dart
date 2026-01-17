@@ -13,7 +13,7 @@ class MatchModel {
   final String? tossWinnerId;
   final String? tossDecision;
   final String? resultDescription;
-  
+
   final DateTime? scheduledDate;
   final String? matchType;
   final String? matchFormat;
@@ -57,7 +57,7 @@ class MatchModel {
       teamAId: json['team_a_id'],
       teamBId: json['team_b_id'],
       ground: json['ground'],
-      matchDate: json['match_date'] != null 
+      matchDate: json['match_date'] != null
           ? DateTime.tryParse(json['match_date']) ?? DateTime.now()
           : DateTime.now(),
       oversCount: json['overs_count'] ?? 20,
@@ -66,13 +66,19 @@ class MatchModel {
       tossWinnerId: json['toss_winner_id'],
       tossDecision: json['toss_decision'],
       resultDescription: json['result_description'],
-      scheduledDate: json['scheduled_date'] != null ? DateTime.tryParse(json['scheduled_date']) : null,
+      scheduledDate: json['scheduled_date'] != null
+          ? DateTime.tryParse(json['scheduled_date'])
+          : null,
       matchType: json['match_type'],
       matchFormat: json['match_format'],
       venueName: json['venue_name'],
       matchNotes: json['match_notes'],
-      startedAt: json['started_at'] != null ? DateTime.tryParse(json['started_at']) : null,
-      endedAt: json['ended_at'] != null ? DateTime.tryParse(json['ended_at']) : null,
+      startedAt: json['started_at'] != null
+          ? DateTime.tryParse(json['started_at'])
+          : null,
+      endedAt: json['ended_at'] != null
+          ? DateTime.tryParse(json['ended_at'])
+          : null,
       teamA: json['team_a'] != null ? Team.fromJson(json['team_a']) : null,
       teamB: json['team_b'] != null ? Team.fromJson(json['team_b']) : null,
     );

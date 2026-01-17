@@ -6,7 +6,7 @@ class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
-      
+
       // Colors
       primaryColor: AppColors.primary,
       scaffoldBackgroundColor: AppColors.background,
@@ -18,27 +18,53 @@ class AppTheme {
         surfaceContainer: AppColors.surfaceContainer,
         error: AppColors.error,
       ),
-      
+
       // Typography
       textTheme: GoogleFonts.interTextTheme().copyWith(
-        displayLarge: GoogleFonts.outfit(fontSize: 57, fontWeight: FontWeight.bold),
-        displayMedium: GoogleFonts.outfit(fontSize: 45, fontWeight: FontWeight.bold),
-        displaySmall: GoogleFonts.outfit(fontSize: 36, fontWeight: FontWeight.bold),
-        headlineLarge: GoogleFonts.outfit(fontSize: 32, fontWeight: FontWeight.bold),
-        headlineMedium: GoogleFonts.outfit(fontSize: 28, fontWeight: FontWeight.w600),
-        headlineSmall: GoogleFonts.outfit(fontSize: 24, fontWeight: FontWeight.w600),
-        titleLarge: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.w600),
+        displayLarge: GoogleFonts.outfit(
+          fontSize: 57,
+          fontWeight: FontWeight.bold,
+        ),
+        displayMedium: GoogleFonts.outfit(
+          fontSize: 45,
+          fontWeight: FontWeight.bold,
+        ),
+        displaySmall: GoogleFonts.outfit(
+          fontSize: 36,
+          fontWeight: FontWeight.bold,
+        ),
+        headlineLarge: GoogleFonts.outfit(
+          fontSize: 32,
+          fontWeight: FontWeight.bold,
+        ),
+        headlineMedium: GoogleFonts.outfit(
+          fontSize: 28,
+          fontWeight: FontWeight.w600,
+        ),
+        headlineSmall: GoogleFonts.outfit(
+          fontSize: 24,
+          fontWeight: FontWeight.w600,
+        ),
+        titleLarge: GoogleFonts.outfit(
+          fontSize: 22,
+          fontWeight: FontWeight.w600,
+        ),
       ),
-      
+
       // App Bar
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: false,
-        titleTextStyle: TextStyle(fontFamily: 'Outfit', fontSize: 20, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+        titleTextStyle: TextStyle(
+          fontFamily: 'Outfit',
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 0.5,
+        ),
       ),
-      
+
       /*
       // Cards - Commented out due to Flutter version compatibility issue (CardTheme vs CardThemeData)
       cardTheme: CardTheme(
@@ -56,7 +82,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
       */
-      
+
       // Buttons
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -68,15 +94,27 @@ class AppTheme {
           elevation: 2,
         ),
       ),
-      
+
       // Inputs
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: Colors.white,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.primary, width: 2)),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
         labelStyle: GoogleFonts.inter(color: Colors.grey.shade700),
       ),
     );

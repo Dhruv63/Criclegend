@@ -14,10 +14,14 @@ final myTeamsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
 });
 
 // 3. Team Members Provider (Family)
-final teamMembersProvider = FutureProvider.family<List<Map<String, dynamic>>, String>((ref, teamId) async {
-  final repo = ref.watch(teamRepositoryProvider);
-  return await repo.getTeamMembers(teamId);
-});
+final teamMembersProvider =
+    FutureProvider.family<List<Map<String, dynamic>>, String>((
+      ref,
+      teamId,
+    ) async {
+      final repo = ref.watch(teamRepositoryProvider);
+      return await repo.getTeamMembers(teamId);
+    });
 
 // 4. Controller for Actions (Create, Add Member)
 final teamControllerProvider = AsyncNotifierProvider<TeamController, void>(() {
@@ -40,7 +44,10 @@ class TeamController extends AsyncNotifier<void> {
     });
   }
 
-  Future<void> addPlayer({required String teamId, required String userId}) async {
+  Future<void> addPlayer({
+    required String teamId,
+    required String userId,
+  }) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final repo = ref.read(teamRepositoryProvider);

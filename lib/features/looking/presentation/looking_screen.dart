@@ -18,33 +18,46 @@ class LookingScreen extends ConsumerWidget {
       backgroundColor: const Color(0xFFF8F9FA),
       // App Bar with Search
       appBar: AppBar(
-        title: Text('Looking For...', style: GoogleFonts.outfit(color: Colors.black, fontWeight: FontWeight.bold)),
+        title: Text(
+          'Looking For...',
+          style: GoogleFonts.outfit(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: false,
         actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 16.0),
-              child: IconButton(
-                onPressed: () {}, 
-                icon: const Icon(Icons.notifications_outlined, color: Colors.black)
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: IconButton(
+              onPressed: () {},
+              icon: const Icon(
+                Icons.notifications_outlined,
+                color: Colors.black,
               ),
-            )
+            ),
+          ),
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
             child: TextField(
-               onChanged: (val) => ref.read(searchCityProvider.notifier).set(val),
-               decoration: InputDecoration(
-                 hintText: 'Search by city (e.g. Mumbai)',
-                 prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                 filled: true,
-                 fillColor: Colors.grey.shade100,
-                 contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
-               ),
+              onChanged: (val) =>
+                  ref.read(searchCityProvider.notifier).set(val),
+              decoration: InputDecoration(
+                hintText: 'Search by city (e.g. Mumbai)',
+                prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                filled: true,
+                fillColor: Colors.grey.shade100,
+                contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide.none,
+                ),
+              ),
             ),
           ),
         ),
@@ -53,22 +66,54 @@ class LookingScreen extends ConsumerWidget {
         children: [
           // Filter Bar
           Container(
-             color: Colors.white,
-             height: 50,
-             child: ListView(
-               scrollDirection: Axis.horizontal,
-               padding: const EdgeInsets.symmetric(horizontal: 16),
-               children: [
-                 _FilterChip(label: 'All', isSelected: selectedCategory == null, onTap: () => ref.read(selectedCategoryProvider.notifier).set(null)),
-                 _FilterChip(label: '🏏 Player', isSelected: selectedCategory == 'Player', onTap: () => ref.read(selectedCategoryProvider.notifier).set('Player')),
-                 _FilterChip(label: '⚔️ Opponent', isSelected: selectedCategory == 'Opponent', onTap: () => ref.read(selectedCategoryProvider.notifier).set('Opponent')),
-                 _FilterChip(label: '👔 Umpire', isSelected: selectedCategory == 'Umpire', onTap: () => ref.read(selectedCategoryProvider.notifier).set('Umpire')),
-                 _FilterChip(label: '🏟️ Ground', isSelected: selectedCategory == 'Ground', onTap: () => ref.read(selectedCategoryProvider.notifier).set('Ground')),
-                 _FilterChip(label: '🎓 Academy', isSelected: selectedCategory == 'Academy', onTap: () => ref.read(selectedCategoryProvider.notifier).set('Academy')),
-               ],
-             ),
+            color: Colors.white,
+            height: 50,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              children: [
+                _FilterChip(
+                  label: 'All',
+                  isSelected: selectedCategory == null,
+                  onTap: () =>
+                      ref.read(selectedCategoryProvider.notifier).set(null),
+                ),
+                _FilterChip(
+                  label: '🏏 Player',
+                  isSelected: selectedCategory == 'Player',
+                  onTap: () =>
+                      ref.read(selectedCategoryProvider.notifier).set('Player'),
+                ),
+                _FilterChip(
+                  label: '⚔️ Opponent',
+                  isSelected: selectedCategory == 'Opponent',
+                  onTap: () => ref
+                      .read(selectedCategoryProvider.notifier)
+                      .set('Opponent'),
+                ),
+                _FilterChip(
+                  label: '👔 Umpire',
+                  isSelected: selectedCategory == 'Umpire',
+                  onTap: () =>
+                      ref.read(selectedCategoryProvider.notifier).set('Umpire'),
+                ),
+                _FilterChip(
+                  label: '🏟️ Ground',
+                  isSelected: selectedCategory == 'Ground',
+                  onTap: () =>
+                      ref.read(selectedCategoryProvider.notifier).set('Ground'),
+                ),
+                _FilterChip(
+                  label: '🎓 Academy',
+                  isSelected: selectedCategory == 'Academy',
+                  onTap: () => ref
+                      .read(selectedCategoryProvider.notifier)
+                      .set('Academy'),
+                ),
+              ],
+            ),
           ),
-          
+
           Expanded(
             child: lookingAsync.when(
               data: (requests) {
@@ -77,9 +122,16 @@ class LookingScreen extends ConsumerWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.search_off, size: 60, color: Colors.grey.shade300),
+                        Icon(
+                          Icons.search_off,
+                          size: 60,
+                          color: Colors.grey.shade300,
+                        ),
                         const SizedBox(height: 16),
-                        Text('No requests found', style: GoogleFonts.inter(color: Colors.grey)),
+                        Text(
+                          'No requests found',
+                          style: GoogleFonts.inter(color: Colors.grey),
+                        ),
                       ],
                     ),
                   );
@@ -89,7 +141,8 @@ class LookingScreen extends ConsumerWidget {
                   child: ListView.builder(
                     padding: const EdgeInsets.all(16),
                     itemCount: requests.length,
-                    itemBuilder: (context, index) => LookingCard(request: requests[index]),
+                    itemBuilder: (context, index) =>
+                        LookingCard(request: requests[index]),
                   ),
                 );
               },
@@ -114,7 +167,11 @@ class _FilterChip extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
 
-  const _FilterChip({required this.label, required this.isSelected, required this.onTap});
+  const _FilterChip({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -129,11 +186,11 @@ class _FilterChip extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
-          label, 
+          label,
           style: TextStyle(
-            color: isSelected ? Colors.white : Colors.black87, 
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal
-          )
+            color: isSelected ? Colors.white : Colors.black87,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          ),
         ),
       ),
     );

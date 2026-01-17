@@ -12,18 +12,17 @@ class CommunityRepository {
           .from('posts')
           .select('*, users:author_id(*), post_likes(user_id)')
           .order('created_at', ascending: false);
-      
+
       // Transform: Add 'is_liked_by_me'
       final myId = _client.auth.currentUser?.id;
-      final List<Map<String, dynamic>> data = List<Map<String, dynamic>>.from(response);
+      final List<Map<String, dynamic>> data = List<Map<String, dynamic>>.from(
+        response,
+      );
 
       return data.map((post) {
         final likes = post['post_likes'] as List;
         final isLiked = myId != null && likes.any((l) => l['user_id'] == myId);
-        return {
-          ...post,
-          'is_liked_by_me': isLiked,
-        };
+        return {...post, 'is_liked_by_me': isLiked};
       }).toList();
     } catch (e) {
       print('Error fetching feed: $e');
@@ -32,7 +31,10 @@ class CommunityRepository {
   }
 
   /// Create a new post
-  Future<void> createPost(String content, {List<String> mediaUrls = const []}) async {
+  Future<void> createPost(
+    String content, {
+    List<String> mediaUrls = const [],
+  }) async {
     final user = _client.auth.currentUser;
     if (user == null) throw 'User not logged in';
 
@@ -67,7 +69,7 @@ class CommunityRepository {
         // We will just let the client side optimistic UI handle the visual, and maybe a trigger handles the count?
         // Detailed Plan said: "Delete row, decrement posts.likes_count"
         // Let's do it manually for now as triggers might not be set up.
-        await _client.rpc('decrement_likes', params: {'row_id': postId}); 
+        await _client.rpc('decrement_likes', params: {'row_id': postId});
       } else {
         // Like
         await _client.from('post_likes').insert({
@@ -78,9 +80,9 @@ class CommunityRepository {
       }
     } catch (e) {
       print('Lik Error: $e'); // Typo intentional to catch my eye if it prints
-      // Fallback if RPC missing: 
+      // Fallback if RPC missing:
       // This is risky without RPC, so we should arguably create the RPCs or assume triggers exist.
-      // Or just do: 
+      // Or just do:
       // update posts set likes_count = likes_count +/- 1 where id = postId
     }
   }

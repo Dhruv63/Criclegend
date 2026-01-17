@@ -23,20 +23,20 @@ class NRRCalculator {
     double oversBowledNormalized = _normalizeOvers(oversBowled);
 
     // Prevent Division by Zero
-    if (oversFacedNormalized == 0) oversFacedNormalized = 1.0; 
+    if (oversFacedNormalized == 0) oversFacedNormalized = 1.0;
     // Technically if faced 0 overs but scored runs (impossible/penalty?), handle graceful.
     // If a team batted 0 overs, their run rate is 0.
-    
+
     // Calculate Team Run Rate
-    double teamRunRate = (oversFacedNormalized > 0) 
-        ? runsScored / oversFacedNormalized 
+    double teamRunRate = (oversFacedNormalized > 0)
+        ? runsScored / oversFacedNormalized
         : 0.0;
 
     // Calculate Opponent Run Rate
     double opponentRunRate = (oversBowledNormalized > 0)
         ? runsConceded / oversBowledNormalized
         : 0.0;
-        
+
     // NRR
     return teamRunRate - opponentRunRate;
   }
@@ -45,13 +45,13 @@ class NRRCalculator {
   static double _normalizeOvers(double overs) {
     int wholeOvers = overs.toInt();
     int balls = ((overs - wholeOvers) * 10).round(); // 10.4 -> 0.4 * 10 = 4.0
-    
+
     // Safety check for balls > 6 (should not happen in valid data, but defensive coding)
     if (balls >= 6) {
       wholeOvers += balls ~/ 6;
       balls = balls % 6;
     }
-    
+
     return wholeOvers + (balls / 6.0);
   }
 }

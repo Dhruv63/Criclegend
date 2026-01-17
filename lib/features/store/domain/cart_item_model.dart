@@ -22,7 +22,9 @@ class CartItem {
       productId: json['product_id'],
       quantity: json['quantity'] ?? 1,
       // Handle joined product data via 'products' key used in Supabase select
-      product: json['products'] != null ? Product.fromJson(json['products']) : null,
+      product: json['products'] != null
+          ? Product.fromJson(json['products'])
+          : null,
     );
   }
 

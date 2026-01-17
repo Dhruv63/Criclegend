@@ -19,7 +19,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
 
   // Contact
   final _emailCtrl = TextEditingController(text: 'support@criclegend.com');
-  
+
   bool _storeOpen = true;
 
   @override
@@ -28,19 +28,28 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
       padding: const EdgeInsets.all(24.0),
       child: ListView(
         children: [
-          const Text("Store Settings", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+          const Text(
+            "Store Settings",
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 24),
 
           _buildSection("Delivery Configuration", [
             TextFormField(
               controller: _freeDeliveryThresholdCtrl,
-              decoration: const InputDecoration(labelText: 'Free Delivery Threshold (₹)', border: OutlineInputBorder()),
+              decoration: const InputDecoration(
+                labelText: 'Free Delivery Threshold (₹)',
+                border: OutlineInputBorder(),
+              ),
               keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 16),
-             TextFormField(
+            TextFormField(
               controller: _deliveryChargeCtrl,
-              decoration: const InputDecoration(labelText: 'Standard Delivery Charge (₹)', border: OutlineInputBorder()),
+              decoration: const InputDecoration(
+                labelText: 'Standard Delivery Charge (₹)',
+                border: OutlineInputBorder(),
+              ),
               keyboardType: TextInputType.number,
             ),
           ]),
@@ -55,17 +64,22 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
             if (_enableTax)
               TextFormField(
                 controller: _taxPercentCtrl,
-                decoration: const InputDecoration(labelText: 'GST Percentage (%)', border: OutlineInputBorder()),
+                decoration: const InputDecoration(
+                  labelText: 'GST Percentage (%)',
+                  border: OutlineInputBorder(),
+                ),
                 keyboardType: TextInputType.number,
               ),
           ]),
-          
+
           _buildSection("Store Status", [
-             SwitchListTile(
+            SwitchListTile(
               title: const Text("Store Open"),
-              subtitle: const Text("Turn off to show maintenance mode to users"),
+              subtitle: const Text(
+                "Turn off to show maintenance mode to users",
+              ),
               value: _storeOpen,
-              activeColor: Colors.green,
+              activeThumbColor: Colors.green,
               onChanged: (v) => setState(() => _storeOpen = v),
               contentPadding: EdgeInsets.zero,
             ),
@@ -74,7 +88,9 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
           const SizedBox(height: 32),
           ElevatedButton(
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Settings Saved Successfully")));
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Settings Saved Successfully")),
+              );
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
@@ -82,7 +98,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
             child: const Text("Save Changes"),
-          )
+          ),
         ],
       ),
     );
@@ -97,7 +113,10 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            Text(
+              title,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
             const Divider(height: 32),
             ...children,
           ],

@@ -13,7 +13,7 @@ class MatchAnalysisScreen extends ConsumerStatefulWidget {
   final String teamBId;
 
   const MatchAnalysisScreen({
-    super.key, 
+    super.key,
     required this.matchId,
     required this.teamAId,
     required this.teamBId,
@@ -22,14 +22,15 @@ class MatchAnalysisScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<MatchAnalysisScreen> createState() => _MatchAnalysisScreenState();
+  ConsumerState<MatchAnalysisScreen> createState() =>
+      _MatchAnalysisScreenState();
 }
 
 class _MatchAnalysisScreenState extends ConsumerState<MatchAnalysisScreen> {
   // We fetch data for both teams
   late Future<List<OverSummary>> _teamAFuture;
   late Future<List<OverSummary>> _teamBFuture;
-  
+
   @override
   void initState() {
     super.initState();
@@ -47,7 +48,10 @@ class _MatchAnalysisScreenState extends ConsumerState<MatchAnalysisScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Match Center - Analytics", style: TextStyle(color: Colors.black)),
+        title: const Text(
+          "Match Center - Analytics",
+          style: TextStyle(color: Colors.black),
+        ),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
@@ -75,33 +79,47 @@ class _MatchAnalysisScreenState extends ConsumerState<MatchAnalysisScreen> {
                 _SectionHeader(title: "Run Rate Comparison (Worm)"),
                 const SizedBox(height: 16),
                 WormChart(
-                  teamAData: teamAData, 
+                  teamAData: teamAData,
                   teamBData: teamBData,
                   teamAName: widget.teamAName,
                   teamBName: widget.teamBName,
                 ),
                 const SizedBox(height: 8),
-                _Legend(teamAName: widget.teamAName, teamBName: widget.teamBName),
-                
+                _Legend(
+                  teamAName: widget.teamAName,
+                  teamBName: widget.teamBName,
+                ),
+
                 const Divider(height: 48),
 
                 // 2. MANHATTAN CHART (Tabbed or Column? Let's do Column for now)
                 _SectionHeader(title: "Overs Comparison (Manhattan)"),
                 const SizedBox(height: 16),
-                
+
                 // Toggle Button for Team A / Team B? Or just show both?
                 // Visual crowding if we show both. Let's show separate blocks.
-                
-                Text(widget.teamAName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                Text(
+                  widget.teamAName,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
                 const SizedBox(height: 8),
                 ManhattanChart(data: teamAData, barColor: AppColors.primary),
-                
+
                 const SizedBox(height: 24),
-                
-                Text(widget.teamBName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+
+                Text(
+                  widget.teamBName,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
                 const SizedBox(height: 8),
                 ManhattanChart(data: teamBData, barColor: AppColors.secondary),
-                
+
                 const SizedBox(height: 40),
               ],
             );
@@ -122,7 +140,10 @@ class _SectionHeader extends StatelessWidget {
       children: [
         Container(width: 4, height: 20, color: AppColors.premiumRed),
         const SizedBox(width: 8),
-        Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        Text(
+          title,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
       ],
     );
   }

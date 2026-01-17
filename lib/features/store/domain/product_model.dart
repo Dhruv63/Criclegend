@@ -34,9 +34,7 @@ class Product {
           : null,
       category: json['category'],
       brand: json['brand'],
-      images: json['images'] != null
-          ? List<String>.from(json['images'])
-          : [],
+      images: json['images'] != null ? List<String>.from(json['images']) : [],
       stockQuantity: json['stock_quantity'] ?? 0,
       isActive: json['is_active'] ?? true,
     );
@@ -59,7 +57,7 @@ class Product {
 
   // Helper to get primary image
   String? get primaryImage => images.isNotEmpty ? images.first : null;
-  
+
   // Calculate discount percentage
   int get discountPercentage {
     if (discountPrice == null || discountPrice! >= price) return 0;

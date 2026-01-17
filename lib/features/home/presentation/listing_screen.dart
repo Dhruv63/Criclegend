@@ -10,8 +10,8 @@ class ListingScreen extends StatelessWidget {
   final ListingType type;
 
   const ListingScreen({
-    super.key, 
-    required this.title, 
+    super.key,
+    required this.title,
     required this.categoryKey,
     required this.type,
   });
@@ -21,19 +21,22 @@ class ListingScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        title: Text(title, style: const TextStyle(color: Colors.white, fontSize: 16)),
+        title: Text(
+          title,
+          style: const TextStyle(color: Colors.white, fontSize: 16),
+        ),
         backgroundColor: AppColors.primary,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: type == ListingType.service 
+        future: type == ListingType.service
             ? SupabaseService.getServicesByCategory(categoryKey)
             : SupabaseService.getBusinessesByCategory(categoryKey),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          
+
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(
               child: Column(
@@ -41,7 +44,10 @@ class ListingScreen extends StatelessWidget {
                 children: [
                   Icon(Icons.search_off, size: 64, color: Colors.grey.shade400),
                   const SizedBox(height: 16),
-                  Text('No $title found.', style: TextStyle(color: Colors.grey.shade600)),
+                  Text(
+                    'No $title found.',
+                    style: TextStyle(color: Colors.grey.shade600),
+                  ),
                 ],
               ),
             );
@@ -52,8 +58,8 @@ class ListingScreen extends StatelessWidget {
             itemCount: snapshot.data!.length,
             itemBuilder: (context, index) {
               final item = snapshot.data![index];
-              return type == ListingType.service 
-                  ? _buildServiceCard(item) 
+              return type == ListingType.service
+                  ? _buildServiceCard(item)
                   : _buildBusinessCard(item);
             },
           );
@@ -68,7 +74,8 @@ class ListingScreen extends StatelessWidget {
     final name = profile['name'] ?? 'Unknown User';
     final location = item['city'] ?? user['location'] ?? 'Mumbai';
     final rate = item['hourly_rate'];
-    final imageUrl = 'https://ui-avatars.com/api/?background=random&name=${name.replaceAll(' ', '+')}';
+    final imageUrl =
+        'https://ui-avatars.com/api/?background=random&name=${name.replaceAll(' ', '+')}';
 
     return Card(
       elevation: 2,
@@ -84,7 +91,11 @@ class ListingScreen extends StatelessWidget {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(item['description'] ?? 'No description', maxLines: 2, overflow: TextOverflow.ellipsis),
+            Text(
+              item['description'] ?? 'No description',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
             const SizedBox(height: 4),
             Row(
               children: [
@@ -99,13 +110,30 @@ class ListingScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            if (rate != null) Text('₹$rate/match', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary)),
+            if (rate != null)
+              Text(
+                '₹$rate/match',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                ),
+              ),
             const SizedBox(height: 4),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(color: Colors.green.shade50, borderRadius: BorderRadius.circular(4)),
-              child: const Text('VERIFIED', style: TextStyle(fontSize: 10, color: Colors.green, fontWeight: FontWeight.bold)),
-            )
+              decoration: BoxDecoration(
+                color: Colors.green.shade50,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: const Text(
+                'VERIFIED',
+                style: TextStyle(
+                  fontSize: 10,
+                  color: Colors.green,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -133,8 +161,13 @@ class ListingScreen extends StatelessWidget {
               height: 120,
               width: double.infinity,
               decoration: BoxDecoration(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
-                image: DecorationImage(image: NetworkImage(imageUrl), fit: BoxFit.cover),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(8),
+                ),
+                image: DecorationImage(
+                  image: NetworkImage(imageUrl),
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
           Padding(
@@ -145,22 +178,43 @@ class ListingScreen extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    Text(
+                      name,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(color: Colors.amber.shade100, borderRadius: BorderRadius.circular(4)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.amber.shade100,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
                       child: const Row(
                         children: [
                           Icon(Icons.star, size: 12, color: Colors.amber),
                           SizedBox(width: 2),
-                          Text('4.5', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                          Text(
+                            '4.5',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ],
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 4),
-                Text(address, style: TextStyle(fontSize: 13, color: Colors.grey.shade600)),
+                Text(
+                  address,
+                  style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                ),
               ],
             ),
           ),

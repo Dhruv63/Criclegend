@@ -5,6 +5,9 @@ class Team {
   final String? logoUrl;
   final List<dynamic> playersArray;
 
+  // Convenience Getter for UI
+  List<dynamic> get players => playersArray;
+
   Team({
     required this.id,
     required this.name,

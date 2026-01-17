@@ -11,12 +11,16 @@ class TeamRepository {
     if (userId == null) throw Exception('User not logged in');
 
     try {
-      final response = await _supabase.from('teams').insert({
-        'name': name,
-        'location': city, // Mapped to DB column 'location'
-        'captain_id': userId,
-        // 'logo_url': ... optional
-      }).select().single();
+      final response = await _supabase
+          .from('teams')
+          .insert({
+            'name': name,
+            'location': city, // Mapped to DB column 'location'
+            'captain_id': userId,
+            // 'logo_url': ... optional
+          })
+          .select()
+          .single();
       return response;
     } catch (e) {
       throw Exception('Failed to create team: $e');
@@ -51,10 +55,10 @@ class TeamRepository {
           .select()
           .ilike('profile_json->>name', '%$query%') // Search inside JSON
           .limit(10);
-          
+
       // Note: If you wanted to search by phone too:
       // .or('profile_json->>name.ilike.%$query%,phone.ilike.%$query%')
-      
+
       return List<Map<String, dynamic>>.from(response);
     } catch (e) {
       print('Error searching players: $e');
@@ -67,9 +71,10 @@ class TeamRepository {
     try {
       // Security: RLS should check if I am captain of teamId
       // Logic: Update user's team_id
-      await _supabase.from('users').update({
-        'team_id': teamId
-      }).eq('id', userId);
+      await _supabase
+          .from('users')
+          .update({'team_id': teamId})
+          .eq('id', userId);
     } catch (e) {
       throw Exception('Failed to add player: $e');
     }

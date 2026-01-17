@@ -35,7 +35,9 @@ class LookingRequest {
       locationCity: map['location_city'] ?? '',
       skillLevel: map['skill_level'],
       urgencyLevel: map['urgency_level'] ?? 'Normal',
-      matchDate: map['match_date'] != null ? DateTime.parse(map['match_date']) : null,
+      matchDate: map['match_date'] != null
+          ? DateTime.parse(map['match_date'])
+          : null,
       description: map['description'],
       status: map['status'] ?? 'Open',
       contactNumber: map['contact_number'],

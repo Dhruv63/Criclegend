@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import '../../../../core/theme/app_colors.dart';
 
 class FeedPostCard extends StatelessWidget {
   final Map<String, dynamic> post;
@@ -8,8 +7,8 @@ class FeedPostCard extends StatelessWidget {
   final VoidCallback? onComment;
 
   const FeedPostCard({
-    super.key, 
-    required this.post, 
+    super.key,
+    required this.post,
     required this.onLike,
     this.onComment,
   });
@@ -24,14 +23,18 @@ class FeedPostCard extends StatelessWidget {
     final media = List<String>.from(post['media_urls'] ?? []);
     final likesCount = post['likes_count'] ?? 0;
     final isLiked = post['is_liked_by_me'] ?? false;
-    
+
     // Avatar
-    final avatarUrl = 'https://ui-avatars.com/api/?background=random&name=${name.replaceAll(' ', '+')}';
+    final avatarUrl =
+        'https://ui-avatars.com/api/?background=random&name=${name.replaceAll(' ', '+')}';
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: Colors.grey.shade200)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Colors.grey.shade200),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -40,13 +43,28 @@ class FeedPostCard extends StatelessWidget {
             // Header
             Row(
               children: [
-                CircleAvatar(backgroundImage: NetworkImage(avatarUrl), radius: 20),
+                CircleAvatar(
+                  backgroundImage: NetworkImage(avatarUrl),
+                  radius: 20,
+                ),
                 const SizedBox(width: 12),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                    Text(timeago.format(createdAt), style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+                    Text(
+                      name,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                    ),
+                    Text(
+                      timeago.format(createdAt),
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 12,
+                      ),
+                    ),
                   ],
                 ),
                 const Spacer(),
@@ -54,7 +72,7 @@ class FeedPostCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-            
+
             // Content
             if (content.isNotEmpty)
               Text(content, style: const TextStyle(fontSize: 15, height: 1.4)),
@@ -66,11 +84,15 @@ class FeedPostCard extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: Image.network(
-                  media.first, 
-                  width: double.infinity, 
-                  height: 200, 
+                  media.first,
+                  width: double.infinity,
+                  height: 200,
                   fit: BoxFit.cover,
-                  errorBuilder: (c,e,s) => Container(height: 200, color: Colors.grey.shade200, child: const Center(child: Icon(Icons.broken_image))),
+                  errorBuilder: (c, e, s) => Container(
+                    height: 200,
+                    color: Colors.grey.shade200,
+                    child: const Center(child: Icon(Icons.broken_image)),
+                  ),
                 ),
               ),
 
@@ -95,7 +117,7 @@ class FeedPostCard extends StatelessWidget {
                 const Spacer(),
                 const Icon(Icons.share_outlined, color: Colors.grey, size: 20),
               ],
-            )
+            ),
           ],
         ),
       ),
@@ -109,7 +131,12 @@ class _ActionButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  const _ActionButton({required this.icon, required this.color, required this.label, required this.onTap});
+  const _ActionButton({
+    required this.icon,
+    required this.color,
+    required this.label,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -119,7 +146,10 @@ class _ActionButton extends StatelessWidget {
         children: [
           Icon(icon, size: 20, color: color),
           const SizedBox(width: 6),
-          Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+          Text(
+            label,
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+          ),
         ],
       ),
     );

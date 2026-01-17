@@ -13,16 +13,12 @@ void main() async {
     url: AppConstants.supabaseUrl,
     anonKey: AppConstants.supabaseAnonKey,
   );
-  
+
   // Use PathUrlStrategy for clean URLs on Web
   // ignore: undefined_function
   // usePathUrlStrategy();
 
-  runApp(
-    const ProviderScope(
-      child: MyApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends ConsumerWidget {

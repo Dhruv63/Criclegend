@@ -1,13 +1,16 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../domain/looking_request_model.dart';
-import '../../auth/data/auth_repository.dart'; // For user check if needed
+// For user check if needed
 
 class LookingRepository {
   final SupabaseClient _client;
 
   LookingRepository(this._client);
 
-  Future<List<LookingRequest>> getRequests({String? category, String? city}) async {
+  Future<List<LookingRequest>> getRequests({
+    String? category,
+    String? city,
+  }) async {
     try {
       var query = _client
           .from('looking_requests')
@@ -23,7 +26,9 @@ class LookingRepository {
       }
 
       // Ordering: Urgent first, then Newest first
-      final response = await query.order('urgency_level', ascending: false).order('created_at', ascending: false);
+      final response = await query
+          .order('urgency_level', ascending: false)
+          .order('created_at', ascending: false);
 
       return (response as List).map((e) => LookingRequest.fromMap(e)).toList();
     } catch (e) {

@@ -16,7 +16,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   final TextEditingController _textController = TextEditingController();
   final CommunityRepository _repo = CommunityRepository();
   final ImagePicker _picker = ImagePicker();
-  
+
   File? _selectedImage;
   bool _isUploading = false;
 
@@ -28,14 +28,19 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
 
   Future<void> _pickImage(ImageSource source) async {
     try {
-      final XFile? pickedFile = await _picker.pickImage(source: source, imageQuality: 70);
+      final XFile? pickedFile = await _picker.pickImage(
+        source: source,
+        imageQuality: 70,
+      );
       if (pickedFile != null) {
         setState(() {
           _selectedImage = File(pickedFile.path);
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error picking image: $e')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error picking image: $e')));
     }
   }
 
@@ -46,7 +51,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
 
     try {
       List<String> mediaUrls = [];
-      
+
       // 1. Upload Image if exists
       if (_selectedImage != null) {
         final userId = Supabase.instance.client.auth.currentUser!.id;
@@ -64,7 +69,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         final imageUrl = Supabase.instance.client.storage
             .from('post_images')
             .getPublicUrl(filePath);
-            
+
         mediaUrls.add(imageUrl);
       }
 
@@ -73,12 +78,15 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
 
       if (mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Post published!')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Post published!')));
       }
-
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error posting: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error posting: $e')));
       }
     } finally {
       if (mounted) setState(() => _isUploading = false);
@@ -90,7 +98,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     final user = Supabase.instance.client.auth.currentUser;
     // We assume user profile is cached or we just use placeholder for now since we are inside the screen
     // ideally we fetch profile, but for MVP we can just show "Me" or generic avatar
-    
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -98,66 +106,115 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
           icon: const Icon(Icons.close, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Create Post', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16)),
+        title: const Text(
+          'Create Post',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
         backgroundColor: Colors.white,
         elevation: 0.5,
         actions: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: ElevatedButton(
-              onPressed: _isUploading || (_textController.text.isEmpty && _selectedImage == null) ? null : _submitPost,
+              onPressed:
+                  _isUploading ||
+                      (_textController.text.isEmpty && _selectedImage == null)
+                  ? null
+                  : _submitPost,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 elevation: 0,
               ),
-              child: _isUploading 
-                  ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                  : const Text('Post', style: TextStyle(fontWeight: FontWeight.bold)),
+              child: _isUploading
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Text(
+                      'Post',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
             ),
-          )
+          ),
         ],
       ),
       body: Column(
         children: [
-          if (_isUploading) const LinearProgressIndicator(color: AppColors.primary, backgroundColor: Colors.white),
-          
+          if (_isUploading)
+            const LinearProgressIndicator(
+              color: AppColors.primary,
+              backgroundColor: Colors.white,
+            ),
+
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // User Info 
+                  // User Info
                   Row(
                     children: [
                       CircleAvatar(
                         backgroundColor: Colors.grey.shade200,
-                        child: const Icon(Icons.person, color: Colors.grey), // Placeholder
+                        child: const Icon(
+                          Icons.person,
+                          color: Colors.grey,
+                        ), // Placeholder
                       ),
                       const SizedBox(width: 12),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Legendary User', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)), 
+                          const Text(
+                            'Legendary User',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               border: Border.all(color: Colors.grey.shade300),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: const Row(
                               children: [
-                                Text('Public', style: TextStyle(fontSize: 10, color: Colors.grey)),
+                                Text(
+                                  'Public',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.grey,
+                                  ),
+                                ),
                                 SizedBox(width: 4),
-                                Icon(Icons.public, size: 10, color: Colors.grey)
+                                Icon(
+                                  Icons.public,
+                                  size: 10,
+                                  color: Colors.grey,
+                                ),
                               ],
                             ),
-                          )
+                          ),
                         ],
-                      )
+                      ),
                     ],
                   ),
                   const SizedBox(height: 20),
@@ -172,9 +229,9 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                       hintStyle: TextStyle(fontSize: 18, color: Colors.grey),
                     ),
                     style: const TextStyle(fontSize: 18),
-                    onChanged: (val) => setState((){}),
+                    onChanged: (val) => setState(() {}),
                   ),
-                  
+
                   const SizedBox(height: 20),
 
                   // Image Preview
@@ -183,7 +240,12 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(12),
-                          child: Image.file(_selectedImage!, width: double.infinity, height: 300, fit: BoxFit.cover),
+                          child: Image.file(
+                            _selectedImage!,
+                            width: double.infinity,
+                            height: 300,
+                            fit: BoxFit.cover,
+                          ),
                         ),
                         Positioned(
                           top: 8,
@@ -192,13 +254,20 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                             onTap: () => setState(() => _selectedImage = null),
                             child: Container(
                               padding: const EdgeInsets.all(4),
-                              decoration: const BoxDecoration(color: Colors.black54, shape: BoxShape.circle),
-                              child: const Icon(Icons.close, color: Colors.white, size: 20),
+                              decoration: const BoxDecoration(
+                                color: Colors.black54,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.close,
+                                color: Colors.white,
+                                size: 20,
+                              ),
                             ),
                           ),
-                        )
+                        ),
                       ],
-                    )
+                    ),
                 ],
               ),
             ),
@@ -207,10 +276,10 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
           // Bottom Actions
           Container(
             padding: EdgeInsets.only(
-              left: 16, 
-              right: 16, 
-              top: 12, 
-              bottom: MediaQuery.of(context).viewInsets.bottom + 12
+              left: 16,
+              right: 16,
+              top: 12,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 12,
             ),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -218,7 +287,10 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
             ),
             child: Row(
               children: [
-                const Text('Add to your post', style: TextStyle(fontWeight: FontWeight.w600)),
+                const Text(
+                  'Add to your post',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
                 const Spacer(),
                 IconButton(
                   icon: const Icon(Icons.photo_library, color: Colors.green),
@@ -230,7 +302,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

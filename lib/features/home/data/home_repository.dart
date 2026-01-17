@@ -1,11 +1,11 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../scoring/domain/match_model.dart';
-import '../../../../core/data/supabase_service.dart';
 
 class HomeRepository {
   final SupabaseClient _client;
 
-  HomeRepository({SupabaseClient? client}) : _client = client ?? Supabase.instance.client;
+  HomeRepository({SupabaseClient? client})
+    : _client = client ?? Supabase.instance.client;
 
   /// Fetches Live and Upcoming matches.
   /// Joins with Teams table to get Team Names and Logos.
@@ -21,9 +21,9 @@ class HomeRepository {
       return data.map((json) => MatchModel.fromJson(json)).toList();
     } catch (e) {
       print('HomeRepository Error: $e');
-      return []; // Return empty on error to avoid breaking UI, or rethrow? 
+      return []; // Return empty on error to avoid breaking UI, or rethrow?
       // Provider will handle AsyncError if we rethrow. Let's rethrow for better UI handling.
-      throw e;
+      rethrow;
     }
   }
 }

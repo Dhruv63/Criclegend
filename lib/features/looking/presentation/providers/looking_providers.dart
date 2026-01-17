@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../data/looking_repository.dart';
 import '../../domain/looking_request_model.dart';
-import '../../../auth/presentation/providers/auth_providers.dart';
 
 // Repository Provider
 final lookingRepositoryProvider = Provider<LookingRepository>((ref) {
@@ -10,7 +9,9 @@ final lookingRepositoryProvider = Provider<LookingRepository>((ref) {
 });
 
 // Category Filter State
-final selectedCategoryProvider = NotifierProvider<CategoryNotifier, String?>(CategoryNotifier.new);
+final selectedCategoryProvider = NotifierProvider<CategoryNotifier, String?>(
+  CategoryNotifier.new,
+);
 
 class CategoryNotifier extends Notifier<String?> {
   @override
@@ -19,7 +20,9 @@ class CategoryNotifier extends Notifier<String?> {
 }
 
 // City Search State
-final searchCityProvider = NotifierProvider<CitySearchNotifier, String?>(CitySearchNotifier.new);
+final searchCityProvider = NotifierProvider<CitySearchNotifier, String?>(
+  CitySearchNotifier.new,
+);
 
 class CitySearchNotifier extends Notifier<String?> {
   @override
@@ -28,10 +31,11 @@ class CitySearchNotifier extends Notifier<String?> {
 }
 
 // Feed Provider (Auto-refreshes when filters change)
-final lookingRequestsProvider = FutureProvider.autoDispose<List<LookingRequest>>((ref) async {
-  final repo = ref.watch(lookingRepositoryProvider);
-  final category = ref.watch(selectedCategoryProvider);
-  final city = ref.watch(searchCityProvider);
-  
-  return repo.getRequests(category: category, city: city);
-});
+final lookingRequestsProvider =
+    FutureProvider.autoDispose<List<LookingRequest>>((ref) async {
+      final repo = ref.watch(lookingRepositoryProvider);
+      final category = ref.watch(selectedCategoryProvider);
+      final city = ref.watch(searchCityProvider);
+
+      return repo.getRequests(category: category, city: city);
+    });

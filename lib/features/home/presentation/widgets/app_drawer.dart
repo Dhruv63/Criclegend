@@ -37,9 +37,9 @@ class AppDrawer extends ConsumerWidget {
                     child: Text(
                       initial,
                       style: GoogleFonts.outfit(
-                        fontSize: 24, 
-                        fontWeight: FontWeight.bold, 
-                        color: const Color(0xFF1D3557)
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF1D3557),
                       ),
                     ),
                   ),
@@ -51,9 +51,9 @@ class AppDrawer extends ConsumerWidget {
                         Text(
                           name,
                           style: GoogleFonts.outfit(
-                            color: Colors.white, 
-                            fontSize: 18, 
-                            fontWeight: FontWeight.bold
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -61,7 +61,10 @@ class AppDrawer extends ConsumerWidget {
                         const SizedBox(height: 4),
                         Text(
                           phone,
-                          style: GoogleFonts.inter(color: Colors.white70, fontSize: 13),
+                          style: GoogleFonts.inter(
+                            color: Colors.white70,
+                            fontSize: 13,
+                          ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -81,42 +84,44 @@ class AppDrawer extends ConsumerWidget {
               children: [
                 _buildMenuItem(
                   context,
-                  icon: Icons.sports_cricket, 
+                  icon: Icons.sports_cricket,
                   title: 'Start a Match',
                   onTap: () => context.push('/new-match'), // Updated Route
                   color: AppColors.primary,
                 ),
                 _buildMenuItem(
                   context,
-                  icon: Icons.groups_outlined, 
+                  icon: Icons.groups_outlined,
                   title: 'My Teams',
-                  onTap: () => {},//context.push('/my-teams'), // Coming soon
+                  onTap: () => {}, //context.push('/my-teams'), // Coming soon
                 ),
                 _buildMenuItem(
                   context,
-                  icon: Icons.bar_chart_rounded, 
+                  icon: Icons.bar_chart_rounded,
                   title: 'My Stats',
                   onTap: () => {}, //context.push('/profile/stats'),
                 ),
                 const Divider(),
                 // Admin Panel Section
-                ref.watch(userRoleProvider).when(
-                  data: (role) => role == 'admin' 
-                    ? _buildMenuItem(
-                        context,
-                        icon: Icons.admin_panel_settings,
-                        title: 'Admin Panel',
-                        color: Colors.red,
-                        onTap: () => context.push('/admin'),
-                      )
-                    : const SizedBox.shrink(),
-                  error: (_, __) => const SizedBox.shrink(),
-                  loading: () => const SizedBox.shrink(),
-                ),
+                ref
+                    .watch(userRoleProvider)
+                    .when(
+                      data: (role) => role == 'admin'
+                          ? _buildMenuItem(
+                              context,
+                              icon: Icons.admin_panel_settings,
+                              title: 'Admin Panel',
+                              color: Colors.red,
+                              onTap: () => context.push('/admin'),
+                            )
+                          : const SizedBox.shrink(),
+                      error: (_, __) => const SizedBox.shrink(),
+                      loading: () => const SizedBox.shrink(),
+                    ),
                 const Divider(),
-                 _buildMenuItem(
+                _buildMenuItem(
                   context,
-                  icon: Icons.logout, 
+                  icon: Icons.logout,
                   title: 'Logout',
                   color: Colors.red,
                   onTap: () async {
@@ -132,8 +137,8 @@ class AppDrawer extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text(
-              'v0.2.0 (Alpha)', 
-              style: GoogleFonts.inter(color: Colors.grey, fontSize: 12)
+              'v0.2.0 (Alpha)',
+              style: GoogleFonts.inter(color: Colors.grey, fontSize: 12),
             ),
           ),
         ],
@@ -143,20 +148,24 @@ class AppDrawer extends ConsumerWidget {
 
   Widget _buildMenuItem(
     BuildContext context, {
-    required IconData icon, 
-    required String title, 
+    required IconData icon,
+    required String title,
     required VoidCallback onTap,
     Color color = Colors.grey, // Default icon color
   }) {
     return ListTile(
-      leading: Icon(icon, color: color == Colors.grey ? Colors.grey.shade700 : color, size: 24),
+      leading: Icon(
+        icon,
+        color: color == Colors.grey ? Colors.grey.shade700 : color,
+        size: 24,
+      ),
       title: Text(
-        title, 
+        title,
         style: GoogleFonts.inter(
-          fontSize: 15, 
+          fontSize: 15,
           fontWeight: FontWeight.w500,
-          color: Colors.black87
-        )
+          color: Colors.black87,
+        ),
       ),
       onTap: () {
         Navigator.pop(context); // Close drawer first

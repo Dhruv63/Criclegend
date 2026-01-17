@@ -17,7 +17,8 @@ final authStateProvider = StreamProvider<AuthState>((ref) {
 // Returns the current User object, updates automatically on auth state change
 final userProvider = Provider<User?>((ref) {
   final authState = ref.watch(authStateProvider);
-  return authState.value?.session?.user ?? Supabase.instance.client.auth.currentUser;
+  return authState.value?.session?.user ??
+      Supabase.instance.client.auth.currentUser;
 });
 
 // 4. Controller Class for Actions (SignOut etc)
@@ -33,6 +34,6 @@ class AuthController {
   Future<void> signOut() async {
     await _repo.signOut();
   }
-  
+
   // Add other actions if needed
 }

@@ -13,7 +13,11 @@ class AuthRepository {
     );
   }
 
-  Future<AuthResponse> signUpWithEmail(String email, String password, {Map<String, dynamic>? data}) async {
+  Future<AuthResponse> signUpWithEmail(
+    String email,
+    String password, {
+    Map<String, dynamic>? data,
+  }) async {
     return await _supabase.auth.signUp(
       email: email,
       password: password,
@@ -39,20 +43,14 @@ class AuthRepository {
     if (user == null) throw Exception('User not logged in');
 
     final updates = {
-      'profile_json': {
-        'name': name,
-        'location': location,
-        'role': role,
-      },
+      'profile_json': {'name': name, 'location': location, 'role': role},
       'is_seller': isSeller,
       'updated_at': DateTime.now().toIso8601String(),
     };
 
-    await _supabase.from('users').upsert({
-      'id': user.id,
-      ...updates,
-    });
+    await _supabase.from('users').upsert({'id': user.id, ...updates});
   }
+
   Future<String?> getUserRole() async {
     final user = _supabase.auth.currentUser;
     if (user == null) return null;
@@ -63,7 +61,7 @@ class AuthRepository {
           .select('role')
           .eq('id', user.id)
           .maybeSingle();
-      
+
       return response?['role'] as String? ?? 'user';
     } catch (e) {
       print('Error fetching role: $e');

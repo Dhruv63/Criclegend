@@ -11,12 +11,13 @@ class CreateLookingScreen extends ConsumerStatefulWidget {
   const CreateLookingScreen({super.key});
 
   @override
-  ConsumerState<CreateLookingScreen> createState() => _CreateLookingScreenState();
+  ConsumerState<CreateLookingScreen> createState() =>
+      _CreateLookingScreenState();
 }
 
 class _CreateLookingScreenState extends ConsumerState<CreateLookingScreen> {
   final _formKey = GlobalKey<FormState>();
-  
+
   // State
   int _step = 1;
   String? _selectedCategory;
@@ -26,42 +27,59 @@ class _CreateLookingScreenState extends ConsumerState<CreateLookingScreen> {
   String _selectedSkill = 'Tennis Ball'; // Default
   bool _isUrgent = false;
 
-  final List<String> _categories = ['Player', 'Opponent', 'Umpire', 'Ground', 'Academy'];
-  final List<String> _skills = ['Tennis Ball', 'Leather Ball', 'Corporate', 'Pro'];
+  final List<String> _categories = [
+    'Player',
+    'Opponent',
+    'Umpire',
+    'Ground',
+    'Academy',
+  ];
+  final List<String> _skills = [
+    'Tennis Ball',
+    'Leather Ball',
+    'Corporate',
+    'Pro',
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('New Request', style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 16)),
+        title: Text(
+          'New Request',
+          style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         foregroundColor: Colors.black,
-        leading: IconButton(icon: const Icon(Icons.close), onPressed: () => context.pop()),
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: () => context.pop(),
+        ),
       ),
       body: Column(
         children: [
           // Progress Bar
           LinearProgressIndicator(
-            value: _step / 3, 
-            backgroundColor: Colors.grey.shade100, 
-            valueColor: const AlwaysStoppedAnimation(AppColors.primary)
+            value: _step / 3,
+            backgroundColor: Colors.grey.shade100,
+            valueColor: const AlwaysStoppedAnimation(AppColors.primary),
           ),
-          
+
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
               child: _buildStepContent(),
             ),
           ),
-          
+
           // Bottom Bar
           Padding(
             padding: const EdgeInsets.all(24.0),
             child: Row(
               children: [
-                if (_step > 1) 
+                if (_step > 1)
                   TextButton(
                     onPressed: () => setState(() => _step--),
                     child: const Text('Back'),
@@ -71,12 +89,20 @@ class _CreateLookingScreenState extends ConsumerState<CreateLookingScreen> {
                   onPressed: _handleNext,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 16,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                   child: Text(
-                    _step == 3 ? 'Post Request' : 'Next', 
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)
+                    _step == 3 ? 'Post Request' : 'Next',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ],
@@ -93,7 +119,13 @@ class _CreateLookingScreenState extends ConsumerState<CreateLookingScreen> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('What are you looking for?', style: GoogleFonts.outfit(fontSize: 24, fontWeight: FontWeight.bold)),
+            Text(
+              'What are you looking for?',
+              style: GoogleFonts.outfit(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 24),
             GridView.count(
               crossAxisCount: 2,
@@ -102,7 +134,9 @@ class _CreateLookingScreenState extends ConsumerState<CreateLookingScreen> {
               mainAxisSpacing: 16,
               crossAxisSpacing: 16,
               childAspectRatio: 1.5,
-              children: _categories.map((cat) => _buildCategoryCard(cat)).toList(),
+              children: _categories
+                  .map((cat) => _buildCategoryCard(cat))
+                  .toList(),
             ),
           ],
         );
@@ -112,66 +146,101 @@ class _CreateLookingScreenState extends ConsumerState<CreateLookingScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-               Text('Fill in the details', style: GoogleFonts.outfit(fontSize: 24, fontWeight: FontWeight.bold)),
-               const SizedBox(height: 24),
-               
-               // City
-               TextFormField(
-                 controller: _cityController,
-                 decoration: _inputDecoration('City / Location', Icons.location_on_outlined),
-                 validator: (v) => v!.isEmpty ? 'Required' : null,
-               ),
-               const SizedBox(height: 16),
+              Text(
+                'Fill in the details',
+                style: GoogleFonts.outfit(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 24),
 
-               // Skill Level (Conditional)
-               if (['Player', 'Opponent', 'Umpire'].contains(_selectedCategory)) ...[
-                 DropdownButtonFormField<String>(
-                   value: _selectedSkill,
-                   decoration: _inputDecoration('Skill / Ball Type', Icons.sports_cricket_outlined),
-                   items: _skills.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
-                   onChanged: (v) => setState(() => _selectedSkill = v!),
-                 ),
-                 const SizedBox(height: 16),
-               ],
-               
-               // Contact
-               TextFormField(
-                 controller: _contactController,
-                 keyboardType: TextInputType.phone,
-                 decoration: _inputDecoration('WhatsApp / Phone', Icons.phone),
-                 validator: (v) => v!.isEmpty ? 'Required' : null,
-               ),
-               const SizedBox(height: 16),
+              // City
+              TextFormField(
+                controller: _cityController,
+                decoration: _inputDecoration(
+                  'City / Location',
+                  Icons.location_on_outlined,
+                ),
+                validator: (v) => v!.isEmpty ? 'Required' : null,
+              ),
+              const SizedBox(height: 16),
 
-               // Description
-               TextFormField(
-                 controller: _descriptionController,
-                 maxLines: 3,
-                 decoration: _inputDecoration('Description (e.g. Need keeper for 20 overs)', Icons.description_outlined),
-                 validator: (v) => v!.isEmpty ? 'Required' : null,
-               ),
-               const SizedBox(height: 24),
-               
-               // Urgency
-               SwitchListTile(
-                 title: const Text('Urgent Requirement?'),
-                 subtitle: const Text('Highlight this post in red'),
-                 value: _isUrgent,
-                 activeColor: AppColors.error,
-                 onChanged: (v) => setState(() => _isUrgent = v),
-               ),
+              // Skill Level (Conditional)
+              if ([
+                'Player',
+                'Opponent',
+                'Umpire',
+              ].contains(_selectedCategory)) ...[
+                DropdownButtonFormField<String>(
+                  initialValue: _selectedSkill,
+                  decoration: _inputDecoration(
+                    'Skill / Ball Type',
+                    Icons.sports_cricket_outlined,
+                  ),
+                  items: _skills
+                      .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                      .toList(),
+                  onChanged: (v) => setState(() => _selectedSkill = v!),
+                ),
+                const SizedBox(height: 16),
+              ],
+
+              // Contact
+              TextFormField(
+                controller: _contactController,
+                keyboardType: TextInputType.phone,
+                decoration: _inputDecoration('WhatsApp / Phone', Icons.phone),
+                validator: (v) => v!.isEmpty ? 'Required' : null,
+              ),
+              const SizedBox(height: 16),
+
+              // Description
+              TextFormField(
+                controller: _descriptionController,
+                maxLines: 3,
+                decoration: _inputDecoration(
+                  'Description (e.g. Need keeper for 20 overs)',
+                  Icons.description_outlined,
+                ),
+                validator: (v) => v!.isEmpty ? 'Required' : null,
+              ),
+              const SizedBox(height: 24),
+
+              // Urgency
+              SwitchListTile(
+                title: const Text('Urgent Requirement?'),
+                subtitle: const Text('Highlight this post in red'),
+                value: _isUrgent,
+                activeThumbColor: AppColors.error,
+                onChanged: (v) => setState(() => _isUrgent = v),
+              ),
             ],
           ),
         );
-        
+
       case 3:
         return Column(
           children: [
-            const Icon(Icons.check_circle_outline, size: 80, color: AppColors.primary),
-             const SizedBox(height: 24),
-            Text('Ready to Post!', style: GoogleFonts.outfit(fontSize: 24, fontWeight: FontWeight.bold)),
-             const SizedBox(height: 8),
-            Text('Your request will be visible to everyone in $_cityController.text', textAlign: TextAlign.center, style: const TextStyle(color: Colors.grey)),
+            const Icon(
+              Icons.check_circle_outline,
+              size: 80,
+              color: AppColors.primary,
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Ready to Post!',
+              style: GoogleFonts.outfit(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Your request will be visible to everyone in $_cityController.text',
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.grey),
+            ),
             const SizedBox(height: 32),
             _buildReviewRow('Category', _selectedCategory!),
             _buildReviewRow('Location', _cityController.text),
@@ -182,7 +251,7 @@ class _CreateLookingScreenState extends ConsumerState<CreateLookingScreen> {
         return const SizedBox.shrink();
     }
   }
-  
+
   Widget _buildReviewRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -203,15 +272,28 @@ class _CreateLookingScreenState extends ConsumerState<CreateLookingScreen> {
       child: Container(
         decoration: BoxDecoration(
           color: isSelected ? AppColors.primary.withOpacity(0.1) : Colors.white,
-          border: Border.all(color: isSelected ? AppColors.primary : Colors.grey.shade200, width: 2),
+          border: Border.all(
+            color: isSelected ? AppColors.primary : Colors.grey.shade200,
+            width: 2,
+          ),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(_getIconForCategory(title), color: isSelected ? AppColors.primary : Colors.grey, size: 32),
+            Icon(
+              _getIconForCategory(title),
+              color: isSelected ? AppColors.primary : Colors.grey,
+              size: 32,
+            ),
             const SizedBox(height: 8),
-            Text(title, style: TextStyle(color: isSelected ? AppColors.primary : Colors.black87, fontWeight: FontWeight.bold)),
+            Text(
+              title,
+              style: TextStyle(
+                color: isSelected ? AppColors.primary : Colors.black87,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ],
         ),
       ),
@@ -219,13 +301,19 @@ class _CreateLookingScreenState extends ConsumerState<CreateLookingScreen> {
   }
 
   IconData _getIconForCategory(String c) {
-    switch(c) {
-      case 'Player': return Icons.person;
-      case 'Opponent': return Icons.shield;
-      case 'Umpire': return Icons.sports;
-      case 'Ground': return Icons.stadium;
-      case 'Academy': return Icons.school;
-      default: return Icons.help;
+    switch (c) {
+      case 'Player':
+        return Icons.person;
+      case 'Opponent':
+        return Icons.shield;
+      case 'Umpire':
+        return Icons.sports;
+      case 'Ground':
+        return Icons.stadium;
+      case 'Academy':
+        return Icons.school;
+      default:
+        return Icons.help;
     }
   }
 
@@ -233,15 +321,23 @@ class _CreateLookingScreenState extends ConsumerState<CreateLookingScreen> {
     return InputDecoration(
       labelText: label,
       prefixIcon: Icon(icon, color: Colors.grey),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
-      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.grey.shade300),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.grey.shade300),
+      ),
     );
   }
 
   void _handleNext() async {
     if (_step == 1) {
       if (_selectedCategory == null) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Select a category')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Select a category')));
         return;
       }
       setState(() => _step++);
@@ -257,8 +353,8 @@ class _CreateLookingScreenState extends ConsumerState<CreateLookingScreen> {
 
         final request = LookingRequest(
           id: '', // Generated by DB
-          userId: user.id, 
-          category: _selectedCategory!, 
+          userId: user.id,
+          category: _selectedCategory!,
           locationCity: _cityController.text,
           skillLevel: _selectedSkill,
           urgencyLevel: _isUrgent ? 'Urgent' : 'Normal',
@@ -269,13 +365,17 @@ class _CreateLookingScreenState extends ConsumerState<CreateLookingScreen> {
 
         await ref.read(lookingRepositoryProvider).createRequest(request);
         if (mounted) {
-           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Posted Successfully!')));
-           context.pop(); // Close wizard
-           // Trigger refresh if needed (provider is autoDispose so usually fine)
-           ref.refresh(lookingRequestsProvider);
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Posted Successfully!')));
+          context.pop(); // Close wizard
+          // Trigger refresh if needed (provider is autoDispose so usually fine)
+          ref.refresh(lookingRequestsProvider);
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     }
   }

@@ -47,6 +47,7 @@ dependencies:
   lucide_icons: ^0.257.0
   fl_chart: ^1.1.1
 
+  url_launcher: any
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -62,6 +63,7 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
+  test: any
 flutter:
 
   # The following line ensures that the Material Icons font is

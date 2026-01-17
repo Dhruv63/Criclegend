@@ -2,8 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/store_repository.dart';
 import '../../domain/cart_item_model.dart';
 
-final storeRepositoryProvider = Provider((ref) => StoreRepository());
-
 final cartProvider = AsyncNotifierProvider<CartNotifier, List<CartItem>>(() {
   return CartNotifier();
 });
@@ -54,13 +52,15 @@ class CartNotifier extends AsyncNotifier<List<CartItem>> {
       if (newQuantity <= 0) {
         await ref.read(storeRepositoryProvider).removeFromCart(cartId);
       } else {
-        await ref.read(storeRepositoryProvider).updateCartQuantity(cartId, newQuantity);
+        await ref
+            .read(storeRepositoryProvider)
+            .updateCartQuantity(cartId, newQuantity);
       }
       await refresh(); // Ensure sync
     } catch (e) {
       // Revert on error
       if (previousState != null) state = AsyncValue.data(previousState);
-      throw e;
+      rethrow;
     }
   }
 
@@ -79,16 +79,31 @@ class CartNotifier extends AsyncNotifier<List<CartItem>> {
       await refresh();
     } catch (e) {
       if (previousState != null) state = AsyncValue.data(previousState);
-      throw e;
+      rethrow;
     }
   }
 
-  // Calculate Subtotal
+  // Calculations
   double get subtotal {
     if (state.value == null) return 0;
     return state.value!.fold(0, (sum, item) {
       final price = item.product?.discountPrice ?? item.product?.price ?? 0;
       return sum + (price * item.quantity);
     });
+  }
+
+  double get deliveryCharge {
+    if (subtotal == 0) return 0;
+    return subtotal > 1000 ? 0 : 50;
+  }
+
+  bool get hasFreeDelivery => subtotal > 1000;
+  double get remainingForFreeDelivery => subtotal > 1000 ? 0 : 1000 - subtotal;
+
+  double get totalAmount => subtotal + deliveryCharge;
+
+  int get itemCount {
+    if (state.value == null) return 0;
+    return state.value!.fold(0, (sum, item) => sum + item.quantity);
   }
 }

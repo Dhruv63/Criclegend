@@ -6,12 +6,12 @@ class ScoringState {
   final int wickets;
   final int oversBowled; // Complete overs
   final int currentBallInOver; // 1-6
-  
+
   // IDs of current players
   final String? strikerId;
   final String? nonStrikerId;
   final String? bowlerId;
-  
+
   final bool isLoading;
   final String? error;
 

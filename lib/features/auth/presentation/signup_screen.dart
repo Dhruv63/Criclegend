@@ -39,21 +39,18 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       final password = _passwordController.text.trim();
       final name = _nameController.text.trim();
       final phone = _phoneController.text.trim();
-      
+
       // 1. Sign Up Auth User
       // Note: We need to pass metadata to be used by the Trigger later?
       // Or we can just sign up and then update profile.
       // Supabase Auth signUp supports 'data' parameter for metadata.
-      
+
       final authRepo = ref.read(authRepositoryProvider);
-      
+
       await authRepo.signUpWithEmail(
-        email, 
+        email,
         password,
-        data: {
-          'full_name': name,
-          'phone': phone,
-        },
+        data: {'full_name': name, 'phone': phone},
       );
 
       if (mounted) {
@@ -64,9 +61,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -78,7 +75,10 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Create Account', style: GoogleFonts.outfit(color: Colors.black)),
+        title: Text(
+          'Create Account',
+          style: GoogleFonts.outfit(color: Colors.black),
+        ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -106,7 +106,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                   style: GoogleFonts.inter(color: Colors.grey),
                 ),
                 const SizedBox(height: 32),
-                
+
                 // Name
                 TextFormField(
                   controller: _nameController,
@@ -168,9 +168,15 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: _isLoading 
-                    ? const CircularProgressIndicator(color: Colors.white) 
-                    : const Text('Sign Up', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  child: _isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text(
+                          'Sign Up',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
               ],
             ),

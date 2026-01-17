@@ -12,8 +12,14 @@ class WagonWheelSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     // 8 Zones
     final zones = [
-      'Long Off', 'Long On', 'Deep Mid Wicket', 'Deep Square Leg',
-      'Fine Leg', 'Third Man', 'Deep Point', 'Deep Cover'
+      'Long Off',
+      'Long On',
+      'Deep Mid Wicket',
+      'Deep Square Leg',
+      'Fine Leg',
+      'Third Man',
+      'Deep Point',
+      'Deep Cover',
     ];
 
     return Dialog(
@@ -47,8 +53,8 @@ class WagonWheelSelector extends StatelessWidget {
                   ...List.generate(8, (index) {
                     final angle = (2 * pi / 8) * index;
                     // Adjust angle to start from top
-                    final rotatedAngle = angle - (pi / 2) - (pi/8); 
-                    
+                    final rotatedAngle = angle - (pi / 2) - (pi / 8);
+
                     return Transform.rotate(
                       angle: (2 * pi / 8) * index,
                       child: Align(
@@ -62,17 +68,24 @@ class WagonWheelSelector extends StatelessWidget {
                   }),
                   // Pitch Area
                   Container(
-                    width: 40, height: 80,
+                    width: 40,
+                    height: 80,
                     decoration: BoxDecoration(
                       color: const Color(0xFFECD2A6),
                       borderRadius: BorderRadius.circular(4),
                       border: Border.all(color: Colors.brown.shade300),
                     ),
-                    child: Center(child: Icon(LucideIcons.crosshair, color: Colors.brown, size: 24)),
+                    child: Center(
+                      child: Icon(
+                        LucideIcons.crosshair,
+                        color: Colors.brown,
+                        size: 24,
+                      ),
+                    ),
                   ),
                 ],
               );
-            }
+            },
           ),
         ),
       ),
@@ -100,9 +113,15 @@ class _SliceButton extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4)],
+            boxShadow: [
+              BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4),
+            ],
           ),
-          child: Text(label, textAlign: TextAlign.center, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+          ),
         ),
       ),
     );
@@ -114,11 +133,11 @@ class _SliceButton extends StatelessWidget {
 class DismissalDialog extends StatefulWidget {
   final List<Map<String, dynamic>> fieldingTeam;
   final List<Map<String, dynamic>> battingTeam;
-  
+
   const DismissalDialog({
-    super.key, 
-    required this.fieldingTeam, 
-    required this.battingTeam
+    super.key,
+    required this.fieldingTeam,
+    required this.battingTeam,
   });
 
   @override
@@ -130,7 +149,14 @@ class _DismissalDialogState extends State<DismissalDialog> {
   String? _fielderId;
   String? _newStrikerId;
 
-  final _types = ['Bowled', 'Caught', 'LBW', 'Run Out', 'Stumped', 'Hit Wicket'];
+  final _types = [
+    'Bowled',
+    'Caught',
+    'LBW',
+    'Run Out',
+    'Stumped',
+    'Hit Wicket',
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -150,20 +176,31 @@ class _DismissalDialogState extends State<DismissalDialog> {
             children: [
               Container(
                 padding: const EdgeInsets.all(8),
-                decoration: const BoxDecoration(color: AppColors.error, shape: BoxShape.circle),
+                decoration: const BoxDecoration(
+                  color: AppColors.error,
+                  shape: BoxShape.circle,
+                ),
                 child: const Icon(Icons.logout, color: Colors.white, size: 20),
               ),
               const SizedBox(width: 12),
-              const Text('Wicket Fall!', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              const Text(
+                'Wicket Fall!',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
             ],
           ),
           const SizedBox(height: 24),
-          
+
           // 1. Dismissal Type
           DropdownButtonFormField<String>(
-            value: _type,
-            decoration: const InputDecoration(labelText: 'How?', border: OutlineInputBorder()),
-            items: _types.map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
+            initialValue: _type,
+            decoration: const InputDecoration(
+              labelText: 'How?',
+              border: OutlineInputBorder(),
+            ),
+            items: _types
+                .map((t) => DropdownMenuItem(value: t, child: Text(t)))
+                .toList(),
             onChanged: (val) => setState(() => _type = val!),
           ),
           const SizedBox(height: 16),
@@ -171,11 +208,17 @@ class _DismissalDialogState extends State<DismissalDialog> {
           // 2. Fielder (Conditional)
           if (needsFielder) ...[
             DropdownButtonFormField<String>(
-              value: _fielderId,
-              decoration: const InputDecoration(labelText: 'Who caught/fielded it?', border: OutlineInputBorder()),
+              initialValue: _fielderId,
+              decoration: const InputDecoration(
+                labelText: 'Who caught/fielded it?',
+                border: OutlineInputBorder(),
+              ),
               items: widget.fieldingTeam.map((p) {
                 final name = p['profile_json']?['name'] ?? 'Unknown';
-                return DropdownMenuItem(value: p['id'] as String, child: Text(name));
+                return DropdownMenuItem(
+                  value: p['id'] as String,
+                  child: Text(name),
+                );
               }).toList(),
               onChanged: (val) => setState(() => _fielderId = val),
             ),
@@ -184,11 +227,17 @@ class _DismissalDialogState extends State<DismissalDialog> {
 
           // 3. New Batsman
           DropdownButtonFormField<String>(
-            value: _newStrikerId,
-            decoration: const InputDecoration(labelText: 'Who is coming in?', border: OutlineInputBorder()),
+            initialValue: _newStrikerId,
+            decoration: const InputDecoration(
+              labelText: 'Who is coming in?',
+              border: OutlineInputBorder(),
+            ),
             items: widget.battingTeam.map((p) {
               final name = p['profile_json']?['name'] ?? 'Unknown';
-              return DropdownMenuItem(value: p['id'] as String, child: Text(name));
+              return DropdownMenuItem(
+                value: p['id'] as String,
+                child: Text(name),
+              );
             }).toList(),
             onChanged: (val) => setState(() => _newStrikerId = val),
           ),
@@ -199,10 +248,17 @@ class _DismissalDialogState extends State<DismissalDialog> {
             width: double.infinity,
             height: 50,
             child: ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.error, foregroundColor: Colors.white),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.error,
+                foregroundColor: Colors.white,
+              ),
               onPressed: () {
                 if (_newStrikerId == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select the new batsman')));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Please select the new batsman'),
+                    ),
+                  );
                   return;
                 }
                 Navigator.pop(context, {

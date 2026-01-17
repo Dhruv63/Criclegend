@@ -40,36 +40,45 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
             children: [
               const Icon(Icons.security, size: 64, color: AppColors.primary),
               const SizedBox(height: 16),
-              const Text('Admin Access', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              const Text(
+                'Admin Access',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 8),
-              const Text('Enter Secure PIN to access Match Console', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey)),
-               const SizedBox(height: 32),
-               TextField(
-                 controller: _pinController,
-                 obscureText: true,
-                 textAlign: TextAlign.center,
-                 keyboardType: TextInputType.number,
-                 style: const TextStyle(fontSize: 24, letterSpacing: 8),
-                 decoration: InputDecoration(
-                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                   hintText: 'PIN',
-                   errorText: _error.isNotEmpty ? _error : null,
-                 ),
-                 onSubmitted: (_) => _login(),
-               ),
-               const SizedBox(height: 24),
-               SizedBox(
-                 width: double.infinity,
-                 height: 50,
-                 child: ElevatedButton(
-                   onPressed: _login,
-                   style: ElevatedButton.styleFrom(
-                     backgroundColor: AppColors.primary,
-                     foregroundColor: Colors.white,
-                   ),
-                   child: const Text('ENTER CONSOLE'),
-                 ),
-               )
+              const Text(
+                'Enter Secure PIN to access Match Console',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey),
+              ),
+              const SizedBox(height: 32),
+              TextField(
+                controller: _pinController,
+                obscureText: true,
+                textAlign: TextAlign.center,
+                keyboardType: TextInputType.number,
+                style: const TextStyle(fontSize: 24, letterSpacing: 8),
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  hintText: 'PIN',
+                  errorText: _error.isNotEmpty ? _error : null,
+                ),
+                onSubmitted: (_) => _login(),
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _login,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text('ENTER CONSOLE'),
+                ),
+              ),
             ],
           ),
         ),

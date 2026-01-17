@@ -1,5 +1,5 @@
-
 class BallModel {
+  final String? id; // added id
   final String matchId;
   final String inningId;
   final int overNumber;
@@ -13,11 +13,11 @@ class BallModel {
   final String strikerId;
   final String nonStrikerId;
   final String bowlerId;
-  
+
   final String? shotZone;
   final String? dismissalType;
   final String? dismissalFielderId;
-  
+
   // Snapshot State (Post-Ball)
   final int matchTotalRuns;
   final int matchWickets;
@@ -26,6 +26,7 @@ class BallModel {
   final DateTime? createdAt;
 
   const BallModel({
+    this.id,
     required this.matchId,
     required this.inningId,
     required this.overNumber,
@@ -51,6 +52,7 @@ class BallModel {
   // Convert to Map for Supabase Insert
   Map<String, dynamic> toJson() {
     return {
+      if (id != null) 'id': id,
       'match_id': matchId,
       'inning_id': inningId,
       'over_number': overNumber,
@@ -64,7 +66,7 @@ class BallModel {
       'shot_zone': shotZone,
       'dismissal_type': dismissalType,
       'dismissal_fielder_id': dismissalFielderId,
-      'striker_id': strikerId, 
+      'striker_id': strikerId,
       'non_striker_id': nonStrikerId,
       'bowler_id': bowlerId,
     };
@@ -73,6 +75,7 @@ class BallModel {
   // Create from Map (for reading from Queue Persistence)
   factory BallModel.fromJson(Map<String, dynamic> json) {
     return BallModel(
+      id: json['id'],
       matchId: json['match_id'],
       inningId: json['inning_id'],
       overNumber: json['over_number'],
@@ -92,10 +95,12 @@ class BallModel {
       matchTotalRuns: json['snapshot_total_runs'] ?? 0,
       matchWickets: json['snapshot_wickets'] ?? 0,
       matchOvers: json['snapshot_overs'] ?? 0.0,
-      createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : null,
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
+          : null,
     );
   }
-  
+
   // Custom 'toQueueJson' to include snapshots
   Map<String, dynamic> toQueueJson() {
     final m = toJson();

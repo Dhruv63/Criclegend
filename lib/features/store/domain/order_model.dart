@@ -1,4 +1,3 @@
-import 'cart_item_model.dart';
 import 'product_model.dart';
 
 class Order {
@@ -38,7 +37,9 @@ class Order {
       contactPhone: json['contact_phone'],
       createdAt: DateTime.parse(json['created_at']),
       items: json['order_items'] != null
-          ? (json['order_items'] as List).map((i) => OrderItem.fromJson(i)).toList()
+          ? (json['order_items'] as List)
+                .map((i) => OrderItem.fromJson(i))
+                .toList()
           : null,
     );
   }
@@ -69,7 +70,9 @@ class OrderItem {
       quantity: json['quantity'],
       priceAtPurchase: (json['price_at_purchase'] as num).toDouble(),
       subtotal: (json['subtotal'] as num).toDouble(),
-      product: json['products'] != null ? Product.fromJson(json['products']) : null,
+      product: json['products'] != null
+          ? Product.fromJson(json['products'])
+          : null,
     );
   }
 }

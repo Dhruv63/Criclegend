@@ -10,8 +10,8 @@ class WormChart extends StatelessWidget {
   final String teamBName;
 
   const WormChart({
-    super.key, 
-    required this.teamAData, 
+    super.key,
+    required this.teamAData,
     required this.teamBData,
     this.teamAName = 'Team A',
     this.teamBName = 'Team B',
@@ -30,26 +30,31 @@ class WormChart extends StatelessWidget {
           minY: 0,
           maxY: maxY,
           lineTouchData: LineTouchData(
-             touchTooltipData: LineTouchTooltipData(
-               getTooltipColor: (_) => Colors.blueGrey,
-               getTooltipItems: (touchedSpots) {
-                 return touchedSpots.map((spot) {
-                   final isTeamA = spot.barIndex == 0;
-                   return LineTooltipItem(
-                     '${isTeamA ? teamAName : teamBName}: ${spot.y.toInt()}',
-                     TextStyle(color: isTeamA ? AppColors.primary : AppColors.secondary, fontWeight: FontWeight.bold),
-                   );
-                 }).toList();
-               },
-             ),
+            touchTooltipData: LineTouchTooltipData(
+              getTooltipColor: (_) => Colors.blueGrey,
+              getTooltipItems: (touchedSpots) {
+                return touchedSpots.map((spot) {
+                  final isTeamA = spot.barIndex == 0;
+                  return LineTooltipItem(
+                    '${isTeamA ? teamAName : teamBName}: ${spot.y.toInt()}',
+                    TextStyle(
+                      color: isTeamA ? AppColors.primary : AppColors.secondary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  );
+                }).toList();
+              },
+            ),
           ),
           gridData: FlGridData(
             show: true,
             drawVerticalLine: true,
             horizontalInterval: 20,
             verticalInterval: 5,
-            getDrawingHorizontalLine: (value) => FlLine(color: Colors.grey.shade200, strokeWidth: 1),
-            getDrawingVerticalLine: (value) => FlLine(color: Colors.grey.shade200, strokeWidth: 1),
+            getDrawingHorizontalLine: (value) =>
+                FlLine(color: Colors.grey.shade200, strokeWidth: 1),
+            getDrawingVerticalLine: (value) =>
+                FlLine(color: Colors.grey.shade200, strokeWidth: 1),
           ),
           titlesData: FlTitlesData(
             show: true,
@@ -57,21 +62,41 @@ class WormChart extends StatelessWidget {
               sideTitles: SideTitles(
                 showTitles: true,
                 getTitlesWidget: (value, meta) {
-                   if (value % 5 == 0) {
-                     return Padding(
-                       padding: const EdgeInsets.only(top: 8.0),
-                       child: Text(value.toInt().toString(), style: const TextStyle(fontSize: 10, color: Colors.grey)),
-                     );
-                   }
-                   return const SizedBox();
+                  if (value % 5 == 0) {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        value.toInt().toString(),
+                        style: const TextStyle(
+                          fontSize: 10,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    );
+                  }
+                  return const SizedBox();
                 },
                 interval: 1,
                 reservedSize: 30,
               ),
             ),
-            leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, interval: 20, reservedSize: 30, getTitlesWidget: (v,m)=>Text(v.toInt().toString(), style: const TextStyle(fontSize: 10, color: Colors.grey)))),
-            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                interval: 20,
+                reservedSize: 30,
+                getTitlesWidget: (v, m) => Text(
+                  v.toInt().toString(),
+                  style: const TextStyle(fontSize: 10, color: Colors.grey),
+                ),
+              ),
+            ),
+            topTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
+            rightTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
           ),
           borderData: FlBorderData(show: false),
           lineBarsData: [
@@ -104,14 +129,20 @@ class WormChart extends StatelessWidget {
   List<FlSpot> _generateSpots(List<OverSummary> data) {
     List<FlSpot> spots = [const FlSpot(0, 0)]; // Start at 0,0
     for (var over in data) {
-      spots.add(FlSpot(over.overNumber.toDouble(), over.cumulativeScore.toDouble()));
+      spots.add(
+        FlSpot(over.overNumber.toDouble(), over.cumulativeScore.toDouble()),
+      );
     }
     return spots;
   }
 
   double _calculateMaxY() {
-    double maxA = teamAData.isNotEmpty ? teamAData.last.cumulativeScore.toDouble() : 0;
-    double maxB = teamBData.isNotEmpty ? teamBData.last.cumulativeScore.toDouble() : 0;
+    double maxA = teamAData.isNotEmpty
+        ? teamAData.last.cumulativeScore.toDouble()
+        : 0;
+    double maxB = teamBData.isNotEmpty
+        ? teamBData.last.cumulativeScore.toDouble()
+        : 0;
     double max = maxA > maxB ? maxA : maxB;
     return (max + 20); // Add buffer
   }
