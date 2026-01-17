@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../store/domain/product_model.dart';
 import '../../data/admin_store_repository.dart';
 import 'add_edit_product_screen.dart';
+import '../../../../core/presentation/widgets/loading/shimmer_list.dart';
+import '../../../../core/presentation/widgets/error/error_banner.dart';
+import 'package:cached_network_image/cached_network_image.dart'; // Import CachedNetworkImage
 
 final adminProductsProvider = FutureProvider.autoDispose
     .family<List<Product>, String?>((ref, query) async {
@@ -199,7 +202,7 @@ class _ProductManagementScreenState
                                               color: Colors.grey.shade200,
                                               image: product.primaryImage != null
                                                   ? DecorationImage(
-                                                      image: NetworkImage(product.primaryImage!),
+                                                      image: CachedNetworkImageProvider(product.primaryImage!),
                                                       fit: BoxFit.cover,
                                                     )
                                                   : null,
@@ -255,8 +258,8 @@ class _ProductManagementScreenState
                           ),
                         );
                       },
-                      error: (err, stack) => Center(child: Text("Error: $err")),
-                      loading: () => const Center(child: CircularProgressIndicator()),
+                      error: (err, stack) => Center(child: ErrorBanner(message: "Error: $err", onRetry: () => ref.refresh(adminProductsProvider(_searchQuery)))),
+                      loading: () => const ShimmerList(itemCount: 8, itemHeight: 60),
                     ),
                   ),
                 ),

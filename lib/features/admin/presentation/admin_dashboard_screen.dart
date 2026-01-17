@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import '../../../../core/theme/app_colors.dart';
 import '../data/admin_repository.dart';
+import '../../../../core/presentation/widgets/loading/shimmer_card.dart';
+import '../../../../core/presentation/widgets/loading/shimmer_list.dart';
 
 class AdminDashboardScreen extends ConsumerStatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -121,9 +123,20 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                     ),
                   ],
                 ),
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (err, stack) => Text('Error loading stats: $err'),
-              ),
+                  loading: () => GridView.count(
+                    crossAxisCount: isWide ? 4 : 2,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: isWide ? 1.4 : 1.05,
+                    children: List.generate(
+                      4,
+                      (index) => const ShimmerCard(height: 100),
+                    ),
+                  ),
+                  error: (err, stack) => Text('Error loading stats: $err'),
+                ),
               const SizedBox(height: 32),
 
               // Quick Actions
@@ -190,8 +203,13 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
-              if (_activityLog.isEmpty)
-                const Center(child: Padding(padding: EdgeInsets.all(20), child: Text("No recent activity")))
+              if (_loadingActivity)
+                const ShimmerList(itemCount: 5, itemHeight: 70)
+              else if (_activityLog.isEmpty)
+                const Center(
+                    child: Padding(
+                        padding: EdgeInsets.all(20),
+                        child: Text("No recent activity")))
               else
                 Card(
                   elevation: 0,

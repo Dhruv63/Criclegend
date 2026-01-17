@@ -7,6 +7,9 @@ import '../../../core/data/supabase_service.dart';
 import 'widgets/app_drawer.dart';
 import 'providers/home_providers.dart';
 import 'widgets/match_card.dart';
+import '../../../core/presentation/widgets/loading/shimmer_card.dart';
+import '../../../core/presentation/widgets/loading/shimmer_list.dart';
+import 'package:cached_network_image/cached_network_image.dart'; // Import CachedNetworkImage
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -93,11 +96,13 @@ class HomeScreen extends ConsumerWidget {
 
           // Matches Stream (Real Data via Riverpod)
           liveMatchesAsync.when(
-            loading: () => const SizedBox(
-              height: 220,
-              child: Center(
-                child: CircularProgressIndicator(color: AppColors.primary),
-              ),
+            loading: () => SizedBox(
+               height: 220,
+               child: ListView.builder(
+                 scrollDirection: Axis.horizontal,
+                 itemCount: 3,
+                 itemBuilder: (_, __) => const ShimmerCard(width: 300, height: 200, margin: EdgeInsets.only(right: 16)),
+               ),
             ),
             error: (err, stack) => Container(
               height: 220,
@@ -170,7 +175,7 @@ class HomeScreen extends ConsumerWidget {
               color: Colors.black87,
               borderRadius: BorderRadius.circular(16),
               image: const DecorationImage(
-                image: NetworkImage(
+                image: CachedNetworkImageProvider(
                   'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=600&auto=format&fit=crop',
                 ), // Cricket field generic
                 fit: BoxFit.cover,
@@ -243,9 +248,13 @@ class HomeScreen extends ConsumerWidget {
             future: SupabaseService.getPopularCricketers(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const SizedBox(
+                return SizedBox(
                   height: 160,
-                  child: Center(child: CircularProgressIndicator()),
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: 4,
+                    itemBuilder: (_, __) => const ShimmerCard(width: 120, height: 160, margin: EdgeInsets.only(right: 12)),
+                  ),
                 );
               }
 
@@ -282,7 +291,7 @@ class HomeScreen extends ConsumerWidget {
                                   ),
                                 ],
                                 image: DecorationImage(
-                                  image: NetworkImage(imageUrl),
+                                  image: CachedNetworkImageProvider(imageUrl),
                                   fit: BoxFit.cover,
                                 ),
                               ),

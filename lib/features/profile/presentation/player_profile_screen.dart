@@ -6,6 +6,8 @@ import '../../../core/theme/app_colors.dart';
 import '../data/player_stats_repository.dart';
 import '../domain/player_stats_model.dart';
 import '../domain/match_performance_model.dart';
+import '../../../core/presentation/widgets/loading/shimmer_card.dart';
+import '../../../core/presentation/widgets/loading/shimmer_list.dart';
 
 final playerStatsRepoProvider = Provider(
   (ref) => PlayerStatsRepository(Supabase.instance.client),
@@ -53,7 +55,7 @@ class PlayerProfileScreen extends ConsumerWidget {
               data: (stats) => stats == null
                   ? const Center(child: Text("No stats available"))
                   : _buildCareerStatsCard(stats),
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => const ShimmerCard(height: 200),
               error: (e, st) => Text("Error: $e"),
             ),
             const SizedBox(height: 24),
@@ -69,7 +71,7 @@ class PlayerProfileScreen extends ConsumerWidget {
             const SizedBox(height: 12),
             historyAsync.when(
               data: (history) => _buildRecentMatchesList(history),
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => const ShimmerList(itemCount: 5, itemHeight: 80),
               error: (e, st) => Text("Error loading history: $e"),
             ),
           ],

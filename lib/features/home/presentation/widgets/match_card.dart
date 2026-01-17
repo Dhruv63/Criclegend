@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../scoring/domain/match_model.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class MatchCard extends StatelessWidget {
   final MatchModel match;
@@ -49,7 +50,7 @@ class MatchCard extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(12.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -72,22 +73,39 @@ class MatchCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Expanded(
                       child: Column(
                         children: [
-                          CircleAvatar(
-                            backgroundColor: Colors.white,
-                            child: Text(
-                              initialA,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
-                              ),
+                          Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              image: match.teamA?.logoUrl != null
+                                  ? DecorationImage(
+                                      image: CachedNetworkImageProvider(
+                                          match.teamA!.logoUrl!),
+                                      fit: BoxFit.cover,
+                                    )
+                                  : null,
                             ),
+                            child: match.teamA?.logoUrl == null
+                                ? Center(
+                                    child: Text(
+                                      initialA,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.primary,
+                                        fontSize: 20,
+                                      ),
+                                    ),
+                                  )
+                                : null,
                           ),
                           const SizedBox(height: 8),
                           Text(
@@ -109,21 +127,38 @@ class MatchCard extends StatelessWidget {
                       style: GoogleFonts.outfit(
                         color: Colors.white70,
                         fontWeight: FontWeight.bold,
-                        fontSize: 24,
+                        fontSize: 20,
                       ),
                     ),
                     Expanded(
                       child: Column(
                         children: [
-                          CircleAvatar(
-                            backgroundColor: Colors.white,
-                            child: Text(
-                              initialB,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
-                              ),
+                          Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              image: match.teamB?.logoUrl != null
+                                  ? DecorationImage(
+                                      image: CachedNetworkImageProvider(
+                                          match.teamB!.logoUrl!),
+                                      fit: BoxFit.cover,
+                                    )
+                                  : null,
                             ),
+                            child: match.teamB?.logoUrl == null
+                                ? Center(
+                                    child: Text(
+                                      initialB,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.primary,
+                                        fontSize: 20,
+                                      ),
+                                    ),
+                                  )
+                                : null,
                           ),
                           const SizedBox(height: 8),
                           Text(
@@ -142,7 +177,7 @@ class MatchCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () {
                     context.push('/live-match/${match.id}');
@@ -154,7 +189,8 @@ class MatchCard extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    minimumSize: const Size(120, 36),
+                    minimumSize: const Size(110, 32),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
                   ),
                   child: const Text('Watch Live'),
                 ),

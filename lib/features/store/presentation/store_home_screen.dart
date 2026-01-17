@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/presentation/widgets/shimmer_loading.dart';
+import '../../../../core/presentation/widgets/loading/shimmer_card.dart'; // Import ShimmerCard
 import '../data/store_repository.dart';
 import '../domain/product_model.dart';
 import 'widgets/product_card.dart';
@@ -397,9 +397,9 @@ class _StoreHomeScreenState extends ConsumerState<StoreHomeScreen> {
           mainAxisSpacing: 12,
         ),
         itemCount: 6,
-        itemBuilder: (_, __) => const ShimmerLoading(
-          isLoading: true,
-          child: Card(elevation: 0, child: SizedBox()), // Placeholder
+        itemBuilder: (_, __) => const ShimmerCard(
+          height: double.infinity,
+          borderRadius: 12,
         ),
       ),
     );
